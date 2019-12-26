@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ScoFoo</string>
+    <string name="app_welcome_msg">What have you eaten?</string>
+    <string name="app_on">on</string>
+    <string name="button_meat">Meat</string>
+    <string name="button_veggi">Veggi</string>
+    <string name="button_vegan">vegan</string>
+</resources>

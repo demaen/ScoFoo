@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="@string/app_welcome_msg"
+        android:textAlignment="center"
+        android:textSize="23sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_on"
+        android:layout_marginTop="150dp"
+        android:textAlignment="center"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:textAlignment="center"
+        android:text="1970-1-1"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/buttonMeat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/button_meat"
+        android:layout_marginTop="250dp"
+        android:textColor="@color/colorDark" />
+
+    <Button
+        android:id="@+id/buttonVeggi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/button_veggi"
+        android:layout_marginTop="300dp"
+        android:textColor="@color/colorDark" />
+
+    <Button
+        android:id="@+id/buttonVegan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/button_vegan"
+        android:layout_marginTop="350dp"
+        android:textColor="@color/colorDark" />
+
+
+</RelativeLayout>
