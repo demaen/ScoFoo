@@ -1,12 +1,17 @@
 package com.scofoo.app
 
-import android.app.DatePickerDialog
+import android.app.*
+import android.content.Context
+import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import java.util.*
+import java.util.Calendar.*
 
 
 class MainActivity: AppCompatActivity() {
@@ -24,17 +29,25 @@ class MainActivity: AppCompatActivity() {
     private var actualDay: String = ""
 
 
+    private var notificationManager: NotificationManager? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
+        createNotificationChannel(
+            "my_channel_01",
+            "ScoFoo Notifications",
+            "All Notifications")
 
         //get the Buttons
         val buttonMeat: Button = findViewById(R.id.buttonMeat)
         val buttonVeggi: Button = findViewById(R.id.buttonVeggi)
         val buttonVegan: Button = findViewById(R.id.buttonVegan)
+        val buttonNotification: Button = findViewById(R.id.buttonNotification)
 
 
         //Set today's date
@@ -67,6 +80,10 @@ class MainActivity: AppCompatActivity() {
             setButtonDesigns(buttonMeat, buttonVeggi, buttonVegan)
 
             saveChoice(actualDay, actualChoice)
+        }
+
+        buttonNotification.setOnClickListener {
+            sendNotification()
         }
 
         labelDate.setOnClickListener {
@@ -185,6 +202,51 @@ class MainActivity: AppCompatActivity() {
 
             }
         }
+
+
+    }
+
+    private fun createNotificationChannel(id: String, name: String, description: String) {
+
+        val importance = NotificationManager.IMPORTANCE_LOW
+        val channel = NotificationChannel(id, name, importance)
+
+        channel.description = description
+        channel.enableLights(true)
+        channel.lightColor = Color.RED
+        channel.enableVibration(true)
+        channel.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
+        notificationManager?.createNotificationChannel(channel)
+    }
+
+
+    private fun sendNotification() {
+
+        val notificationID = 101
+
+        val resultIntent = Intent(this, MainActivity::class.java)
+
+        val datetimeToAlarm = Calendar.getInstance(Locale.getDefault())
+        datetimeToAlarm.timeInMillis = System.currentTimeMillis()
+        datetimeToAlarm.set(HOUR_OF_DAY, 22)
+        datetimeToAlarm.set(MINUTE, 0)
+        datetimeToAlarm.set(SECOND, 0)
+        datetimeToAlarm.set(MILLISECOND, 0)
+        datetimeToAlarm.set(DAY_OF_WEEK, 0)
+
+        val pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val channelID = "my_channel_01"
+
+        val notification = Notification.Builder(this@MainActivity, channelID)
+            .setContentTitle("Example Notification")
+            .setContentText("This is an example notification.")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setChannelId(channelID)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notificationManager?.notify(notificationID, notification)
 
 
     }
