@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import java.time.LocalDate
 
 class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,null,DATABASE_VERSION) {
 
@@ -43,8 +44,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         // Inserting Row
         val success = db.insert(TABLE_CHOICES, null, contentValues)
 
-        //2nd argument is String containing nullColumnHack
-        db.close() // Closing database connection
+        // Closing database connection
+        db.close()
 
         return success
     }
@@ -92,10 +93,9 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
      * returns -1 when no result
      * returns 0 1 2 when choice found
      */
-    fun selectChoice(day: String):Int {
-        var choice: Int = -1
+    fun selectChoice(day: String):Int? {
 
-        val selectQuery = "SELECT " + KEY_CHOICE + " FROM " + TABLE_CHOICES + "  WHERE " + KEY_DAY + "='" + day +"'"
+        val selectQuery = "SELECT $KEY_CHOICE FROM $TABLE_CHOICES  WHERE $KEY_DAY='$day'"
         val db = this.readableDatabase
 
         var cursor: Cursor? = null
@@ -103,28 +103,140 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            db.execSQL(selectQuery)
-            return choice //error
+            println("Yeah this is a problem!")
+            return null
         }
 
         //there should be just one result!
-
-
         if (cursor.moveToFirst()) {
-            choice = cursor.getInt(cursor.getColumnIndex(KEY_CHOICE))
-            /*
-            do {
-
-
-            } while (cursor.moveToNext())
-
-             */
+            return cursor.getInt(cursor.getColumnIndex(KEY_CHOICE))
         }
 
 
-        return choice
+        return null
 
     }
+
+    fun getOldestEntry(): DataModelClass? {
+
+        val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES  ORDER BY $KEY_DAY ASC"
+        val db = this.readableDatabase
+
+        var cursor: Cursor? = null
+
+        try {
+            cursor = db.rawQuery(selectQuery, null)
+        } catch (e: SQLiteException) {
+            println("error!")
+        }
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                return DataModelClass(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
+            }
+        }
+
+        return null
+
+    }
+
+    fun getNewestEntry(): DataModelClass? {
+
+        val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES  ORDER BY $KEY_DAY DESC"
+        val db = this.readableDatabase
+
+        var cursor: Cursor? = null
+
+        try {
+            cursor = db.rawQuery(selectQuery, null)
+        } catch (e: SQLiteException) {
+            println("error!")
+        }
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+
+                return DataModelClass(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
+
+            }
+        }
+
+        return null
+    }
+
+    fun getMissingDays(): MutableList<LocalDate>? {
+
+        var resultList = mutableListOf<LocalDate>()
+
+        val dmcOldestEntry:DataModelClass? = getOldestEntry()
+        val dmcNewestEntry:DataModelClass? = getNewestEntry()
+
+        if (dmcOldestEntry != null) {
+            if (dmcNewestEntry != null) {
+                if(dmcOldestEntry.day != dmcNewestEntry.day ) {
+                    //now we want to find all dates since our oldest entry, which have not been set by any choice
+
+
+                    //we start at the oldest entry
+                    var pointer = LocalDate.parse(dmcOldestEntry.day).plusDays(1)
+
+
+                    while (pointer.toString() != dmcNewestEntry.day) {
+
+                        if(selectChoice(pointer.toString()) == null) {
+                            //oops we found sth
+
+                            val thatDay = pointer.toString()
+
+                            resultList.add(
+                                LocalDate.parse(
+                                    thatDay
+                                )
+                            )
+
+                        }
+
+                        //and start to check the next day
+                        pointer = pointer.plusDays(1)
+                    }
+
+                } else {
+                    return null
+                }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+
+        return if(resultList.count() == 0) {
+            null
+        } else {
+            resultList
+        }
+
+
+    }
+
+    fun getDayCountOfChoice(choice: Int): Int? {
+
+        val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_CHOICE='$choice'"
+        val db = this.readableDatabase
+
+        var cursor: Cursor? = null
+
+        try {
+            cursor = db.rawQuery(selectQuery, null)
+        } catch (e: SQLiteException) {
+            println("Could not exec getMeatDays() query!")
+            return null
+        }
+
+        return cursor.count
+
+    }
+
 
 
     //method to update data
@@ -146,6 +258,78 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         return success
     }
 
+    fun updateDateFormat() {
+        val selectQuery = "SELECT $KEY_DAY FROM $TABLE_CHOICES"
+        val db = this.readableDatabase
+
+        var cursor: Cursor? = null
+
+        try {
+            cursor = db.rawQuery(selectQuery, null)
+        } catch (e: SQLiteException) {
+            println(e)
+        }
+
+
+
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+
+                    val date = cursor.getString(cursor.getColumnIndex(KEY_DAY))
+                    val parts = date.split("-")
+
+                    val oldMonth = parts[1]
+                    val oldDay = parts[2]
+
+                    var newMonth = ""
+                    var newDay = ""
+
+                    var newDate = ""
+
+                    newMonth = if(oldMonth.toInt() < 10) {
+                        "0$oldMonth"
+                    } else {
+                        oldMonth
+                    }
+
+                    newDay = if(oldDay.toInt() < 10) {
+                        "0$oldDay"
+                    } else {
+                        oldDay
+                    }
+
+                    newDate = parts[0] + "-" + newMonth + "-" + newDay
+
+                    //println("Year: " + parts[0])
+                    //println("Month: $oldMonth -> $newMonth")
+                    //println("Day: $oldDay -> $newDay")
+                    println("$date -> $newDate")
+
+
+
+                    val db = this.writableDatabase
+
+                    val contentValues = ContentValues()
+                    contentValues.put(KEY_DAY, newDate)
+
+                    // Updating Row
+                    val success = db.update(TABLE_CHOICES, contentValues, "$KEY_DAY='$date'",null)
+
+                    //2nd argument is String containing nullColumnHack
+                    db.close() // Closing database connection
+
+                    println(success)
+
+                } while (cursor.moveToNext())
+
+
+            }
+        }
+
+
+    }
 
     /*
     //method to delete data
