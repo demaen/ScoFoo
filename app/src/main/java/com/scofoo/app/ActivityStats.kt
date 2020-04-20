@@ -1,8 +1,16 @@
 package com.scofoo.app
 
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.Gravity
+import android.widget.LinearLayout
+import android.widget.TableLayout
+import android.widget.TableRow
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.math.roundToInt
+
 
 class ActivityStats: AppCompatActivity() {
 
@@ -20,19 +28,7 @@ class ActivityStats: AppCompatActivity() {
         val daysMeat: TextView = findViewById(R.id.daysMeat)
         val daysVeggi: TextView = findViewById(R.id.daysVeggi)
         val daysVegan: TextView = findViewById(R.id.daysVegan)
-        val goalDateStart: TextView = findViewById(R.id.goalDateStart)
-        val goalDateEnd: TextView = findViewById(R.id.goalDateEnd)
-        val goalCountMeatMax: TextView = findViewById(R.id.goalCountMeatMax)
-        val goalCountVeggiMin: TextView = findViewById(R.id.goalCountVeggiMin)
-        val goalCountVeganMin: TextView = findViewById(R.id.goalCountVeganMin)
-        val goalDaysBetween: TextView = findViewById(R.id.goalDaysBetween)
-        val goalMissingDays: TextView = findViewById(R.id.goalMissingDays)
-        val goalDaysMeat: TextView = findViewById(R.id.goalDaysMeat)
-        val goalDaysVeggi: TextView = findViewById(R.id.goalDaysVeggi)
-        val goalDaysVegan: TextView = findViewById(R.id.goalDaysVegan)
-        val goalMeat: TextView = findViewById(R.id.goalMeat)
-        val goalVeggi: TextView = findViewById(R.id.goalVeggi)
-        val goalVegan: TextView = findViewById(R.id.goalVegan)
+        val goalTable: TableLayout = findViewById(R.id.goalTable)
 
         today.text = intent.getStringExtra("today")
         actualDay.text = intent.getStringExtra("actualDay")
@@ -43,19 +39,71 @@ class ActivityStats: AppCompatActivity() {
         daysMeat.text = intent.getStringExtra("daysMeat")
         daysVeggi.text = intent.getStringExtra("daysVeggi")
         daysVegan.text = intent.getStringExtra("daysVegan")
-        goalDateStart.text = intent.getStringExtra("goalDateStart")
-        goalDateEnd.text = intent.getStringExtra("goalDateEnd")
-        goalCountMeatMax.text = intent.getStringExtra("goalCountMeatMax")
-        goalCountVeggiMin.text = intent.getStringExtra("goalCountVeggiMin")
-        goalCountVeganMin.text = intent.getStringExtra("goalCountVeganMin")
-        goalDaysBetween.text = intent.getStringExtra("goalDaysBetween")
-        goalMissingDays.text = intent.getStringExtra("goalMissingDays")
-        goalDaysMeat.text = intent.getStringExtra("goalDaysMeat")
-        goalDaysVeggi.text = intent.getStringExtra("goalDaysVeggi")
-        goalDaysVegan.text = intent.getStringExtra("goalDaysVegan")
-        goalMeat.text = intent.getStringExtra("goalMeat")
-        goalVeggi.text = intent.getStringExtra("goalVeggi")
-        goalVegan.text = intent.getStringExtra("goalVegan")
+
+
+
+
+        val dmcGoals: Array<DMCGoal> = intent.getSerializableExtra("dmcGoals") as Array<DMCGoal>
+
+        var rowCount = 1
+
+        for(dmcGoal in dmcGoals) {
+            val tr = TableRow(this)
+
+            val tv1 = TextView(this)
+            val tv2 = TextView(this)
+            val tv3 = TextView(this)
+            val tv4 = TextView(this)
+            val tv5 = TextView(this)
+            val tv6 = TextView(this)
+            val tv7 = TextView(this)
+            val tv8 = TextView(this)
+
+            tv1.text = dmcGoal.start.toString()
+            tv2.text = dmcGoal.end.toString()
+            tv3.text = when(dmcGoal.choice) { 0 -> {"Meat"} 1 -> {"Veggi"} 2 -> {"Vegan"} else -> {""} }
+            tv4.text = when(dmcGoal.type) { 0 -> {">="} 1 -> {"<="} 2 -> {"=="} else -> {""} }
+            tv5.text = dmcGoal.target.toString()
+            tv6.text = dmcGoal.value.toString()
+            tv7.text = dmcGoal.achieved.toString()
+            tv8.text = when(dmcGoal.achievable) { null -> {"-"} else -> {dmcGoal.achievable.toString()} }
+
+            tv1.textSize = 10.0F
+            tv2.textSize = 10.0F
+            tv3.textSize = 10.0F
+            tv4.textSize = 10.0F
+            tv5.textSize = 10.0F
+            tv6.textSize = 10.0F
+            tv7.textSize = 10.0F
+            tv8.textSize = 10.0F
+
+            tr.addView(tv1)
+            tr.addView(tv2)
+            tr.addView(tv3)
+            tr.addView(tv4)
+            tr.addView(tv5)
+            tr.addView(tv6)
+            tr.addView(tv7)
+            tr.addView(tv8)
+
+            if(rowCount % 2 == 0) {
+                //even
+            } else {
+                //odd
+                tr.background = getDrawable(R.color.colorMildGray)
+            }
+
+            tr.gravity = Gravity.CENTER
+            tr.orientation = LinearLayout.HORIZONTAL
+
+            goalTable.addView(tr)
+
+            rowCount++
+
+        }
+
+
+
 
     }
 }

@@ -103,17 +103,23 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            println("Yeah this is a problem!")
-            return null
+            println(e)
         }
 
-        //there should be just one result!
-        if (cursor.moveToFirst()) {
-            return cursor.getInt(cursor.getColumnIndex(KEY_CHOICE))
+        var result:Int? = null
+
+        if (cursor != null) {
+
+            if (cursor.moveToFirst()) {
+                result = cursor.getInt(cursor.getColumnIndex(KEY_CHOICE))
+            }
+
+            cursor.close()
         }
 
 
-        return null
+        return result
+
 
     }
 

@@ -311,6 +311,7 @@ class MainActivity: AppCompatActivity() {
     }
 
     private fun updateDayChoice() {
+
         labelDate?.text = actualDay;
 
         //what is the actual choice if any?

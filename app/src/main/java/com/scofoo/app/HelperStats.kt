@@ -26,17 +26,15 @@ class HelperStats(private val context: Context, private val databaseHandler: Dat
         //setup the intent
         val intent = Intent(context, ActivityStats::class.java)
 
-        //what is todays date?
+        //what is today's date?
         today = LocalDate.now().toString()
         intent.putExtra("today", today)
         
         //what days is actually selected?
         intent.putExtra("actualDay", actualDay)
 
-
         //what is the actual choice if any?
         actualChoice = databaseHandler.selectChoice(actualDay)
-        
 
         //get the oldest entry
         val dmcOldestEntry: DataModelClass? = databaseHandler.getOldestEntry()
@@ -99,6 +97,7 @@ class HelperStats(private val context: Context, private val databaseHandler: Dat
         intent.putExtra("daysVegan", daysVegan.toString())
 
         //now the goals
+
         intent.putExtra("goalDateStart", goalDateStart.toString())
         intent.putExtra("goalDateEnd", goalDateEnd.toString())
         intent.putExtra("goalCountMeatMax", goalCountMeatMax.toString())
@@ -110,7 +109,7 @@ class HelperStats(private val context: Context, private val databaseHandler: Dat
         intent.putExtra("goalDaysBetween", goalDaysBetween.toString())
 
         //How many days are missing in the target zone?
-        val goalMissingDays = databaseHandler.getMissingDays( goalDateStart, goalDateEnd)
+        val goalMissingDays = databaseHandler.getMissingDays(goalDateStart, goalDateEnd)
 
         if (goalMissingDays != null) {
             intent.putExtra("goalMissingDays", goalMissingDays.count().toString())
@@ -209,9 +208,86 @@ class HelperStats(private val context: Context, private val databaseHandler: Dat
 
 
 
+        //now the new goals
+
+        var dmcGoal1 = DMCGoal(0, 1, 52, LocalDate.parse("2020-01-01"), LocalDate.parse("2020-12-31"))
+        var dmcGoal2 = DMCGoal(1, 0, 314, LocalDate.parse("2020-01-01"), LocalDate.parse("2020-12-31"))
+        var dmcGoal3 = DMCGoal(2, 0, 122, LocalDate.parse("2020-01-01"), LocalDate.parse("2020-12-31"))
+
+        dmcGoal1 = goalAchieved(dmcGoal1)
+        dmcGoal2 = goalAchieved(dmcGoal2)
+        dmcGoal3 = goalAchieved(dmcGoal3)
+
+        var dmcGoals: Array<DMCGoal> = arrayOf(dmcGoal1, dmcGoal2, dmcGoal3)
+
+        intent.putExtra("dmcGoals", dmcGoals)
+
         //come up with the activity
         context.startActivity(intent)
 
+    }
+
+    private fun goalAchieved(dmcGoal: DMCGoal): DMCGoal {
+
+        var goalDays = databaseHandler.getDayCountOfChoice(dmcGoal.choice, dmcGoal.start.toString(), dmcGoal.end.toString())
+        val goalDaysMissingList = databaseHandler.getMissingDays(dmcGoal.start, dmcGoal.end)
+        val goalDaysMissing = goalDaysMissingList?.count() ?: 0
+
+        if (dmcGoal.choice == 1) {
+            //vegan days count as veggi too
+            goalDays += databaseHandler.getDayCountOfChoice(2, dmcGoal.start.toString(), dmcGoal.end.toString())
+        }
+
+        dmcGoal.value = goalDays;
+
+        when (dmcGoal.type) {
+            0 -> {
+                //handling min relation
+
+                dmcGoal.achieved = goalDays >= dmcGoal.target
+            }
+            1 -> {
+                //handling max relation
+
+                dmcGoal.achieved = goalDays <= dmcGoal.target
+            }
+            2 -> {
+                //handling equals relation
+
+                dmcGoal.achieved = goalDays == dmcGoal.target
+            }
+        }
+
+        if(dmcGoal.achieved != null) {
+            if(dmcGoal.achieved == false) {
+                //let's see if it's still achievable
+
+
+                val goalDaysPotential = goalDays + goalDaysMissing
+
+                when (dmcGoal.type) {
+                    0 -> {
+                        //min relation
+
+
+                        dmcGoal.achievable = goalDaysPotential >= dmcGoal.target
+
+                    }
+                    1 -> {
+                        //if it's a max relation, and it's not achieved there is nothing you can do about the past
+
+                    }
+                    2 -> {
+                        //now it's important to know if we are under our score or above
+
+                        //dmcGoal.achievable = goalDaysPotential >= dmcGoal.value
+
+                    }
+                }
+            }
+        }
+
+        return dmcGoal
     }
 
 
