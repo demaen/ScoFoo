@@ -90,12 +90,12 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
     */
 
     /**
-     * returns -1 when no result
+     * returns null when no result
      * returns 0 1 2 when choice found
      */
     fun selectChoice(day: String):Int? {
 
-        val selectQuery = "SELECT $KEY_CHOICE FROM $TABLE_CHOICES  WHERE $KEY_DAY='$day'"
+        val selectQuery = "SELECT $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_DAY='$day'"
         val db = this.readableDatabase
 
         var cursor: Cursor? = null
@@ -164,48 +164,29 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         return null
     }
 
-    fun getMissingDays(): MutableList<LocalDate>? {
+    fun getMissingDays(start:LocalDate, end:LocalDate): MutableList<LocalDate>? {
 
         var resultList = mutableListOf<LocalDate>()
 
-        val dmcOldestEntry:DataModelClass? = getOldestEntry()
-        val dmcNewestEntry:DataModelClass? = getNewestEntry()
-
-        if (dmcOldestEntry != null) {
-            if (dmcNewestEntry != null) {
-                if(dmcOldestEntry.day != dmcNewestEntry.day ) {
-                    //now we want to find all dates since our oldest entry, which have not been set by any choice
+        if(start < end) {
+            //now we want to find all dates since our oldest entry, which have not been set by any choice
 
 
-                    //we start at the oldest entry
-                    var pointer = LocalDate.parse(dmcOldestEntry.day).plusDays(1)
+            //we start at the oldest entry
+            var pointer = start
 
 
-                    while (pointer.toString() != dmcNewestEntry.day) {
+            while (pointer <= end) {
 
-                        if(selectChoice(pointer.toString()) == null) {
-                            //oops we found sth
-
-                            val thatDay = pointer.toString()
-
-                            resultList.add(
-                                LocalDate.parse(
-                                    thatDay
-                                )
-                            )
-
-                        }
-
-                        //and start to check the next day
-                        pointer = pointer.plusDays(1)
-                    }
-
-                } else {
-                    return null
+                if(selectChoice(pointer.toString()) == null) {
+                    //this day has no db entry
+                    resultList.add(pointer)
                 }
-            } else {
-                return null
+
+                //set the pointer to the next day
+                pointer = pointer.plusDays(1)
             }
+
         } else {
             return null
         }
@@ -219,7 +200,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
     }
 
-    fun getDayCountOfChoice(choice: Int): Int? {
+    fun getDayCountOfChoice(choice: Int): Int {
 
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_CHOICE='$choice'"
         val db = this.readableDatabase
@@ -230,10 +211,26 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
             println("Could not exec getMeatDays() query!")
-            return null
         }
 
-        return cursor.count
+        return cursor?.count ?: 0
+
+    }
+
+    fun getDayCountOfChoice(choice: Int, start: String, end: String): Int {
+
+        val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_CHOICE='$choice' AND $KEY_DAY >= '$start' AND $KEY_DAY <= '$end'"
+        val db = this.readableDatabase
+
+        var cursor: Cursor? = null
+
+        try {
+            cursor = db.rawQuery(selectQuery, null)
+        } catch (e: SQLiteException) {
+            println("Could not exec getMeatDays() query!")
+        }
+
+        return cursor?.count ?: 0
 
     }
 

@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.Calendar.*
 
@@ -266,7 +267,7 @@ class MainActivity: AppCompatActivity() {
 
         //maybe we should beat some threshold
         //difference > 1/2 display width or sth like that
-        if(difference > displaySizeX/2) {
+        if(difference > displaySizeX/10) {
 
             var newDate = LocalDate.parse(actualDay)
 

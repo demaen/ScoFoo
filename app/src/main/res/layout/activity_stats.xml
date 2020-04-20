@@ -18,13 +18,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Today: "
-                android:textSize="24sp" />
+                android:textSize="18sp" />
             <TextView
-                android:id="@+id/zeile0"
+                android:id="@+id/today"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hey Stats!"
-                android:textSize="24sp" />
+                android:text=""
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
@@ -34,13 +34,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Selected: "
-                android:textSize="24sp" />
+                android:textSize="18sp" />
             <TextView
-                android:id="@+id/zeile1"
+                android:id="@+id/actualDay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hey Stats!"
-                android:textSize="24sp" />
+                android:text=""
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
@@ -50,13 +50,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="First Day: "
-                android:textSize="24sp" />
+                android:textSize="18sp" />
             <TextView
-                android:id="@+id/zeile2"
+                android:id="@+id/oldestEntry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hey Stats!"
-                android:textSize="24sp" />
+                android:text=""
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
@@ -66,13 +66,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Last Day: "
-                android:textSize="24sp" />
+                android:textSize="18sp" />
             <TextView
-                android:id="@+id/zeile3"
+                android:id="@+id/newestEntry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hey Stats!"
-                android:textSize="24sp" />
+                android:text=""
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
@@ -82,13 +82,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Days Between: "
-                android:textSize="24sp" />
+                android:textSize="18sp" />
             <TextView
-                android:id="@+id/zeile4"
+                android:id="@+id/daysBetween"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hey Stats!"
-                android:textSize="24sp" />
+                android:text=""
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
@@ -97,14 +97,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Days Without: "
-                android:textSize="24sp" />
+                android:text="Days Missing: "
+                android:textSize="18sp" />
             <TextView
-                android:id="@+id/zeile5"
+                android:id="@+id/missingDays"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hey Stats!"
-                android:textSize="24sp" />
+                android:text=""
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
@@ -114,13 +114,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Days Meat: "
-                android:textSize="24sp" />
+                android:textSize="18sp" />
             <TextView
-                android:id="@+id/zeile6"
+                android:id="@+id/daysMeat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hey Stats!"
-                android:textSize="24sp" />
+                android:text=""
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
@@ -130,13 +130,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Days Veggi: "
-                android:textSize="24sp" />
+                android:textSize="18sp" />
             <TextView
-                android:id="@+id/zeile7"
+                android:id="@+id/daysVeggi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hey Stats!"
-                android:textSize="24sp" />
+                android:text=""
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
@@ -146,13 +146,221 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Days Vegan: "
-                android:textSize="24sp" />
+                android:textSize="18sp" />
             <TextView
-                android:id="@+id/zeile8"
+                android:id="@+id/daysVegan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hey Stats!"
-                android:textSize="24sp" />
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Start: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalDateStart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal End: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalDateEnd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Days Meat Max: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalCountMeatMax"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Days Veggi Min: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalCountVeggiMin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Days Vegan Min: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalCountVeganMin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Days Between: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalDaysBetween"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Days Missing: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalMissingDays"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Days Meat: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalDaysMeat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Days Veggi: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalDaysVeggi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Days Vegan: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalDaysVegan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Meat: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalMeat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Veggi: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalVeggi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Goal Vegan: "
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/goalVegan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="18sp" />
         </TableRow>
 
     </TableLayout>
