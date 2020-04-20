@@ -70,13 +70,20 @@ class HelperStats(private val context: Context, private val databaseHandler: Dat
 
 
         //get the missing days
-        val missingDays = databaseHandler.getMissingDays(LocalDate.parse(dmcOldestEntry?.day), LocalDate.parse(dmcNewestEntry?.day))
+        if(dmcOldestEntry != null && dmcNewestEntry != null) {
 
-        if (missingDays != null) {
-            intent.putExtra("missingDays", missingDays.count().toString())
+            val missingDays = databaseHandler.getMissingDays(LocalDate.parse(dmcOldestEntry?.day), LocalDate.parse(dmcNewestEntry?.day))
+
+            if (missingDays != null) {
+                intent.putExtra("missingDays", missingDays.count().toString())
+            } else {
+                intent.putExtra("missingDays", "0")
+            }
+
         } else {
-            intent.putExtra("missingDays", "0")
+            intent.putExtra("missingDays", "")
         }
+
 
 
         //count days meat

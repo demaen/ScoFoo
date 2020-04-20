@@ -174,7 +174,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
         var resultList = mutableListOf<LocalDate>()
 
-        if(start < end) {
+        if(start <= end) {
             //now we want to find all dates since our oldest entry, which have not been set by any choice
 
 
