@@ -204,7 +204,7 @@ class ActivityMain: AppCompatActivity() {
             intent.putExtra("actualDay", actualDay)
 
             //get the oldest entry
-            val dmcOldestEntry: DataModelClass? = databaseHandler.getOldestEntry()
+            val dmcOldestEntry: DMCChoice? = databaseHandler.getOldestEntry()
 
             if(dmcOldestEntry != null) {
                 println("Oldest Entry: " + dmcOldestEntry.day + " " + dmcOldestEntry.choice)
@@ -215,7 +215,7 @@ class ActivityMain: AppCompatActivity() {
             }
 
             //get the newest entry
-            val dmcNewestEntry: DataModelClass? = databaseHandler.getNewestEntry()
+            val dmcNewestEntry: DMCChoice? = databaseHandler.getNewestEntry()
 
             if(dmcNewestEntry != null) {
                 println("Newest Entry: " + dmcNewestEntry.day + " " + dmcNewestEntry.choice)
@@ -441,7 +441,7 @@ class ActivityMain: AppCompatActivity() {
 
             if(day.trim() != "") {
 
-                var dmc = DataModelClass(day, choice)
+                var dmc = DMCChoice(day, choice)
 
                 val status = databaseHandler.insertChoice(dmc)
 
@@ -460,7 +460,7 @@ class ActivityMain: AppCompatActivity() {
             if(actualChoice != choice) {
                 //update!
 
-                var dmc = DataModelClass(day, choice)
+                var dmc = DMCChoice(day, choice)
 
                 var resultUpdate = databaseHandler.updateChoice(dmc)
 

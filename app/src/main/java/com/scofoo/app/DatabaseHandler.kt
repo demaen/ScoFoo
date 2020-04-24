@@ -49,7 +49,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
     /** Method to insert data
      *
      */
-    fun insertChoice(dmc: DataModelClass):Long {
+    fun insertChoice(dmc: DMCChoice):Long {
 
         val db = this.writableDatabase
 
@@ -189,7 +189,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
     }
 
-    fun getOldestEntry(): DataModelClass? {
+    fun getOldestEntry(): DMCChoice? {
 
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES  ORDER BY $KEY_DAY ASC"
         val db = this.readableDatabase
@@ -204,7 +204,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-                return DataModelClass(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
+                return DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
             }
         }
 
@@ -212,7 +212,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
     }
 
-    fun getNewestEntry(): DataModelClass? {
+    fun getNewestEntry(): DMCChoice? {
 
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES  ORDER BY $KEY_DAY DESC"
         val db = this.readableDatabase
@@ -228,7 +228,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         if (cursor != null) {
             if (cursor.moveToFirst()) {
 
-                return DataModelClass(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
+                return DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
 
             }
         }
@@ -309,7 +309,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
 
     //method to update data
-    fun updateChoice(dmc: DataModelClass):Int{
+    fun updateChoice(dmc: DMCChoice):Int{
 
         val db = this.writableDatabase
 
