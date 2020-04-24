@@ -14,25 +14,41 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         private val DATABASE_VERSION = 1
         private val DATABASE_NAME = "EmployeeDatabase"
         private val TABLE_CHOICES = "Choices"
+        private val TABLE_GOALS = "Goals"
         private val KEY_DAY = "day"
         private val KEY_CHOICE = "choice"
+        private val KEY_GOAL_ID = "rowid"
+        private val KEY_GOAL_CHOICE = "goalChoice"
+        private val KEY_GOAL_TYPE = "goalType"
+        private val KEY_GOAL_TARGET = "goalTarget"
+        private val KEY_GOAL_Start = "goalStart"
+        private val KEY_GOAL_END = "goalEnd"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
         //creating table with fields
-        val CREATE_CONTACTS_TABLE = ("CREATE TABLE " + TABLE_CHOICES + "("
+
+        db?.execSQL("CREATE TABLE " + TABLE_CHOICES + "("
                 + KEY_DAY + " TEXT PRIMARY KEY,"
                 + KEY_CHOICE + " INTEGER" + ")")
-        db?.execSQL(CREATE_CONTACTS_TABLE)
+
+        db?.execSQL("CREATE TABLE " + TABLE_GOALS + "("
+                + KEY_GOAL_CHOICE + " INTEGER,"
+                + KEY_GOAL_TYPE + " INTEGER,"
+                + KEY_GOAL_TARGET + " INTEGER,"
+                + KEY_GOAL_Start + " TEXT,"
+                + KEY_GOAL_END + " TEXT" + ")")
+
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db!!.execSQL("DROP TABLE IF EXISTS " + TABLE_CHOICES)
-        onCreate(db)
+        //db!!.execSQL("DROP TABLE IF EXISTS " + TABLE_CHOICES)
+        //onCreate(db)
     }
 
-
-    //method to insert data
+    /** Method to insert data
+     *
+     */
     fun insertChoice(dmc: DataModelClass):Long {
 
         val db = this.writableDatabase
@@ -50,44 +66,94 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         return success
     }
 
+    fun insertGoal(dmcGoal: DMCGoal): Long {
 
-    /*
-    //method to read data
-    fun viewAllDayChoice():List<DataModelClass>  {
+        val db = this.writableDatabase
 
-        val choiceList:ArrayList<DataModelClass> = ArrayList<DataModelClass>()
+        val contentValues = ContentValues()
+        contentValues.put(KEY_GOAL_CHOICE, dmcGoal.choice)
+        contentValues.put(KEY_GOAL_TYPE, dmcGoal.type)
+        contentValues.put(KEY_GOAL_TARGET, dmcGoal.target)
+        contentValues.put(KEY_GOAL_Start, dmcGoal.start.toString())
+        contentValues.put(KEY_GOAL_END, dmcGoal.end.toString())
 
-        val selectQuery = "SELECT  * FROM $TABLE_CHOICES"
+        // Inserting Row
+        // returns the row ID of the newly inserted row, or -1 if an error occurred
+        val rowId = db.insert(TABLE_GOALS, null, contentValues)
+
+        // Closing database connection
+        db.close()
+
+        return rowId
+
+    }
+
+    fun selectGoals(): MutableList<DMCGoal> {
+
+        var dmcGoals = mutableListOf<DMCGoal>()
+
         val db = this.readableDatabase
+        val selectQuery = "SELECT $KEY_GOAL_CHOICE, $KEY_GOAL_TYPE, $KEY_GOAL_TARGET, $KEY_GOAL_Start, $KEY_GOAL_END FROM $TABLE_GOALS"
 
         var cursor: Cursor? = null
 
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            db.execSQL(selectQuery)
-            return ArrayList()
+            println(e)
         }
 
-        var day: String
-        var choice: Int
+        if (cursor != null) {
 
-        if (cursor.moveToFirst()) {
-            do {
+            if (cursor.moveToFirst()) {
 
-                day = cursor.getString(cursor.getColumnIndex(KEY_DAY))
-                choice = cursor.getInt(cursor.getColumnIndex(KEY_CHOICE))
+                do {
 
-                val dmc = DataModelClass(day, choice)
+                    val dmcGoal = DMCGoal(
+                        cursor.getInt(cursor.getColumnIndex(KEY_GOAL_CHOICE)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_GOAL_TYPE)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_GOAL_TARGET)),
+                        LocalDate.parse(cursor.getString(cursor.getColumnIndex(KEY_GOAL_Start))),
+                        LocalDate.parse(cursor.getString(cursor.getColumnIndex(KEY_GOAL_END)))
+                    )
 
-                choiceList.add(dmc)
+                    dmcGoals.add(dmcGoal)
 
-            } while (cursor.moveToNext())
+                } while (cursor.moveToNext())
+
+
+            }
+
+            cursor.close()
+
         }
 
-        return choiceList
+        db.close()
+
+        return dmcGoals
+
     }
-    */
+
+    fun selectGoalsCount(): Int {
+        val db = this.readableDatabase
+        val selectQuery = "SELECT $KEY_GOAL_ID FROM $TABLE_GOALS"
+
+        var cursor: Cursor? = null
+
+        try {
+            cursor = db.rawQuery(selectQuery, null)
+        } catch (e: SQLiteException) {
+            println(e)
+        }
+
+        if (cursor != null) {
+
+            return cursor.count
+
+        }
+
+        return 0
+    }
 
     /**
      * returns null when no result

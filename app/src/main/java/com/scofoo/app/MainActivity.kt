@@ -194,7 +194,80 @@ class MainActivity: AppCompatActivity() {
 
         buttonGoToStats?.setOnClickListener {
 
-            HelperStats(this, databaseHandler, actualDay)
+            //setup the intent
+            val intent = Intent(this, ActivityStats::class.java)
+
+            //what is today's date?
+            intent.putExtra("today", LocalDate.now().toString())
+
+            //what days is actually selected?
+            intent.putExtra("actualDay", actualDay)
+
+            //get the oldest entry
+            val dmcOldestEntry: DataModelClass? = databaseHandler.getOldestEntry()
+
+            if(dmcOldestEntry != null) {
+                println("Oldest Entry: " + dmcOldestEntry.day + " " + dmcOldestEntry.choice)
+
+                intent.putExtra("oldestEntry", dmcOldestEntry.day)
+            } else {
+                println("Oldest Entry: No choices found.")
+            }
+
+            //get the newest entry
+            val dmcNewestEntry: DataModelClass? = databaseHandler.getNewestEntry()
+
+            if(dmcNewestEntry != null) {
+                println("Newest Entry: " + dmcNewestEntry.day + " " + dmcNewestEntry.choice)
+
+                intent.putExtra("newestEntry", dmcNewestEntry.day)
+            } else {
+                println("Newest Entry: No choices found.")
+            }
+
+            //how many days between oldest and newest?
+            if(dmcOldestEntry != null && dmcNewestEntry != null) {
+                val dateBefore: LocalDate = LocalDate.parse(dmcOldestEntry.day)
+                val dateAfter: LocalDate = LocalDate.parse(dmcNewestEntry.day)
+                val daysBetween: Long = ChronoUnit.DAYS.between(dateBefore, dateAfter.plusDays(1))
+
+                intent.putExtra("daysBetween", daysBetween.toString())
+            }
+
+            //get the missing days
+            if(dmcOldestEntry != null && dmcNewestEntry != null) {
+
+                val missingDays = databaseHandler.getMissingDays(LocalDate.parse(dmcOldestEntry.day), LocalDate.parse(dmcNewestEntry.day))
+
+                if (missingDays != null) {
+                    intent.putExtra("missingDays", missingDays.count().toString())
+                } else {
+                    intent.putExtra("missingDays", "0")
+                }
+
+            } else {
+                intent.putExtra("missingDays", "")
+            }
+
+            //count days meat
+            val daysMeat = databaseHandler.getDayCountOfChoice(0)
+            intent.putExtra("daysMeat", daysMeat.toString())
+
+            //count days veggi
+            val daysVeggi = databaseHandler.getDayCountOfChoice(1)
+
+            //count days vegan
+            val daysVegan = databaseHandler.getDayCountOfChoice(2)
+
+            //of course vegan days are veggi too
+            val daysVeggiInclVegan = daysVeggi + daysVegan
+            intent.putExtra("daysVeggi", "$daysVeggi (+ $daysVegan = $daysVeggiInclVegan)")
+
+            //now set the vegan days
+            intent.putExtra("daysVegan", daysVegan.toString())
+
+            //come up with the activity
+            this.startActivity(intent)
 
         }
 

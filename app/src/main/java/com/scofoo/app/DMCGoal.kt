@@ -16,4 +16,4 @@ import java.time.LocalDate
  * @property end that's the date where the time frame ends (including this day)
  *
  */
-class DMCGoal (val choice:Int, val type: Int, val target: Int, val start: LocalDate, val end: LocalDate, var achieved: Boolean? = null, var achievable: Boolean? = null, var value: Int? = null): Serializable
+class DMCGoal (val choice:Int, val type: Int, val target: Int, val start: LocalDate, val end: LocalDate): Serializable

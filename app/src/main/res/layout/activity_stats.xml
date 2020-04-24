@@ -173,6 +173,14 @@
         </TableRow>
     </TableLayout>
 
+    <Button
+        android:id="@+id/buttonAddGoal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="250dp"
+        android:text="Add Goal" />
+
     <TableLayout
         android:id="@+id/goalTable"
         android:layout_width="match_parent"
