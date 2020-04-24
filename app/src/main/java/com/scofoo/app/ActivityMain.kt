@@ -107,9 +107,6 @@ class ActivityMain: AppCompatActivity() {
         today = LocalDate.now().toString()
         actualDay = today
 
-        //!!! Be aware of that next function @todo deprecated -> delete it
-        //databaseHandler.updateDateFormat()
-
         //now we need to get the choice from the database and how the buttons should be highlighted
         updateDayChoice()
 
