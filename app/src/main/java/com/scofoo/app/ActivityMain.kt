@@ -18,7 +18,7 @@ import java.util.*
 import java.util.Calendar.*
 
 
-class MainActivity: AppCompatActivity() {
+class ActivityMain: AppCompatActivity() {
 
     private val databaseHandler = DatabaseHandler(this)
 
@@ -496,7 +496,7 @@ class MainActivity: AppCompatActivity() {
 
         val notificationID = 101
 
-        val resultIntent = Intent(this, MainActivity::class.java)
+        val resultIntent = Intent(this, ActivityMain::class.java)
 
         val datetimeToAlarm = Calendar.getInstance(Locale.getDefault())
         datetimeToAlarm.timeInMillis = System.currentTimeMillis()
@@ -510,7 +510,7 @@ class MainActivity: AppCompatActivity() {
 
         val channelID = "my_channel_01"
 
-        val notification = Notification.Builder(this@MainActivity, channelID)
+        val notification = Notification.Builder(this@ActivityMain, channelID)
             .setContentTitle("Example Notification")
             .setContentText("This is an example notification.")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
