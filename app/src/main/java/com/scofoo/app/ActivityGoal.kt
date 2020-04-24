@@ -29,14 +29,11 @@ class ActivityGoal: AppCompatActivity() {
     private var radioButtonChoice: RadioButton? = null
     private var choice: Int? = null
 
-
     private var radioGroupType: RadioGroup? = null
     private var radioButtonType: RadioButton? = null
     private var type: Int? = null
 
     private var target: Int? = null
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -181,7 +178,7 @@ class ActivityGoal: AppCompatActivity() {
     }
 
     fun checkRadioChoice(view: View) {
-        var radioIdChoice = radioGroupChoice?.checkedRadioButtonId
+        val radioIdChoice = radioGroupChoice?.checkedRadioButtonId
 
         radioButtonChoice = radioIdChoice?.let { findViewById(it) }
 
@@ -200,7 +197,7 @@ class ActivityGoal: AppCompatActivity() {
     }
 
     fun checkRadioType(view: View) {
-        var radioIdType = radioGroupType?.checkedRadioButtonId
+        val radioIdType = radioGroupType?.checkedRadioButtonId
 
         radioButtonType = radioIdType?.let { findViewById(it) }
 
@@ -218,4 +215,5 @@ class ActivityGoal: AppCompatActivity() {
         }
 
     }
+
 }

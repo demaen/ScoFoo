@@ -12,9 +12,8 @@ class ActivityStats: AppCompatActivity() {
     private val databaseHandler = DatabaseHandler(this)
     private var dmcGoals: MutableList<DMCGoal>? = null
 
-
     private var today: TextView? = null
-    private var actualDay: TextView? = null
+    private var selectedDateView: TextView? = null
     private var oldestEntry: TextView? = null
     private var newestEntry: TextView? = null
     private var daysBetween: TextView? = null
@@ -30,7 +29,7 @@ class ActivityStats: AppCompatActivity() {
         setContentView(R.layout.activity_stats)
 
         today = findViewById(R.id.today)
-        actualDay = findViewById(R.id.actualDay)
+        selectedDateView = findViewById(R.id.selectedDate)
         oldestEntry = findViewById(R.id.oldestEntry)
         newestEntry = findViewById(R.id.newestEntry)
         daysBetween = findViewById(R.id.daysBetween)
@@ -42,7 +41,7 @@ class ActivityStats: AppCompatActivity() {
 
 
         today?.text = intent.getStringExtra("today")
-        actualDay?.text = intent.getStringExtra("actualDay")
+        selectedDateView?.text = intent.getStringExtra("selectedDate")
         oldestEntry?.text = intent.getStringExtra("oldestEntry")
         newestEntry?.text = intent.getStringExtra("newestEntry")
         daysBetween?.text = intent.getStringExtra("daysBetween")

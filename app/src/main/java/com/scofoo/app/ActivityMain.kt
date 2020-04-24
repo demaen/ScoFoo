@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Point
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Display
@@ -23,31 +22,26 @@ import java.util.Calendar.*
 
 class ActivityMain: AppCompatActivity() {
 
-    private val debugMode = false
+    //by activating the debug mode some additional information will be displayed (like touch coordinates)
+    private val debugMode = true
 
+    //we need to connect to the database
     private val databaseHandler = DatabaseHandler(this)
 
-    //allowed choices: 0 meat 1 veggi 2 vegan
-    private var actualChoice: Int? = null
+    private var today: LocalDate = LocalDate.now()
 
-    private val calendar = Calendar.getInstance()
-    private var year = calendar.get(Calendar.YEAR)
-    private var month = calendar.get(Calendar.MONTH)+1
-    private var day = calendar.get(Calendar.DAY_OF_MONTH)
+    private var selectedDate: LocalDate = today
 
-    private var actualDay: String = ""
-    private var today: String = ""
-
-    var x1: Float? = 0.toFloat()
-    var x2: Float? = 0.toFloat()
+    private var displaySizeX = 0
+    private var x1: Float? = 0.toFloat()
+    private var x2: Float? = 0.toFloat()
 
     private var debugTable: TableLayout? = null
-    private var zeile0: TextView? = null
-    private var zeile1: TextView? = null
-    private var zeile2: TextView? = null
-    private var zeile3: TextView? = null
-    private var zeile4: TextView? = null
-
+    private var debugTableRow0: TextView? = null
+    private var debugTableRow1: TextView? = null
+    private var debugTableRow2: TextView? = null
+    private var debugTableRow3: TextView? = null
+    private var debugTableRow4: TextView? = null
 
     private var buttonMeat: Button? = null
     private var buttonVeggi: Button? = null
@@ -55,9 +49,7 @@ class ActivityMain: AppCompatActivity() {
     private var buttonNotification: Button? = null
     private var buttonGoToStats: Button? = null
 
-    private var labelDate: TextView? = null
-
-    private var displaySizeX = 0;
+    private var selectedDateLabel: TextView? = null
 
     private var notificationManager: NotificationManager? = null
 
@@ -66,27 +58,29 @@ class ActivityMain: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //get the Buttons
+        //get the buttons
         buttonMeat = findViewById(R.id.buttonMeat)
         buttonVeggi = findViewById(R.id.buttonVeggi)
         buttonVegan = findViewById(R.id.buttonVegan)
         buttonNotification = findViewById(R.id.buttonNotification)
         buttonGoToStats = findViewById(R.id.buttonGoToStats)
 
-        //get the table elements
+        //get the debug table elements
         debugTable = findViewById(R.id.debugTable)
-        zeile0 = findViewById(R.id.zeile0)
-        zeile1 = findViewById(R.id.zeile1)
-        zeile2 = findViewById(R.id.zeile2)
-        zeile3 = findViewById(R.id.zeile3)
-        zeile4 = findViewById(R.id.zeile4)
+        debugTableRow0 = findViewById(R.id.zeile0)
+        debugTableRow1 = findViewById(R.id.zeile1)
+        debugTableRow2 = findViewById(R.id.zeile2)
+        debugTableRow3 = findViewById(R.id.zeile3)
+        debugTableRow4 = findViewById(R.id.zeile4)
 
+        //if wanted display the debug table
         if(debugMode) {
             debugTable?.visibility = View.VISIBLE
+            buttonNotification?.visibility = View.VISIBLE
         }
 
-        //get the datepickerlabelbutton
-        labelDate = findViewById(R.id.date)
+        //get the Label for the selectedDate
+        selectedDateLabel = findViewById(R.id.selectedDate)
 
         //let's find out how big our screen is
         val display: Display = windowManager.defaultDisplay
@@ -97,65 +91,16 @@ class ActivityMain: AppCompatActivity() {
         //let's take care of the notifications
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        createNotificationChannel(
-            "my_channel_01",
-            "ScoFoo Notifications",
-            "All Notifications")
-
-
-        //Set today's date
-        today = LocalDate.now().toString()
-        actualDay = today
+        //open a Notification Channel
+        createNotificationChannel("my_channel_01","ScoFoo Notifications","All Notifications")
 
         //now we need to get the choice from the database and how the buttons should be highlighted
         updateDayChoice()
 
-        ///////////////////////////
         //Big section with Listeners
 
-        buttonMeat?.setOnClickListener {
-
-            if(actualChoice != 0) {
-
-                actualChoice = 0
-
-                setButtonDesigns()
-
-                saveChoice(actualDay, 0)
-
-            }
-
-        }
-
-        buttonVeggi?.setOnClickListener {
-
-            if(actualChoice != 1) {
-
-                actualChoice = 1
-
-                setButtonDesigns()
-
-                saveChoice(actualDay, 1)
-            }
-        }
-
-        buttonVegan?.setOnClickListener {
-
-            if(actualChoice != 2) {
-
-                actualChoice = 2
-
-                setButtonDesigns()
-
-                saveChoice(actualDay, 2)
-            }
-        }
-
-        buttonNotification?.setOnClickListener {
-            sendNotification()
-        }
-
-        labelDate?.setOnClickListener {
+        //when we hit the selectedDateLabel
+        selectedDateLabel?.setOnClickListener {
 
             val dpd = DatePickerDialog(this, DatePickerDialog.OnDateSetListener {
                     view,
@@ -163,43 +108,83 @@ class ActivityMain: AppCompatActivity() {
                     selectedMonth,
                     selectedDay ->
 
-                    //we have to build the String properly, because those values are int and need leading "0" maybe
-                    var selectedDayString: String = "$selectedYear-"
+                //we have to build the String properly, because those values are int and need leading "0" maybe
+                var selectedDateString: String = "$selectedYear-"
 
-                    //month starts with 0 = jan ... thats why incrementing it
-                    //every month under 10 need a leading "0"
-                    if(selectedMonth+1 < 10) {
-                        selectedDayString += "0"
-                    }
+                //month starts with 0 = jan ... thats why incrementing it
+                //every month under 10 need a leading "0"
+                if(selectedMonth+1 < 10) {
+                    selectedDateString += "0"
+                }
 
-                    //Append the month
-                    selectedDayString += (selectedMonth+1).toString() + "-"
+                //Append the month
+                selectedDateString += (selectedMonth+1).toString() + "-"
 
-                    //same for the days, but days start with 1 in contrast with months
-                    if(selectedDay < 10) {
-                        selectedDayString += "0"
-                    }
+                //same for the days, but days start with 1 in contrast with months
+                if(selectedDay < 10) {
+                    selectedDateString += "0"
+                }
 
-                    //append the days
-                    selectedDayString += (selectedDay).toString()
+                //append the days
+                selectedDateString += (selectedDay).toString()
 
-                    //we need to set these so that the picker highlights the right day when opened again
-                    year = selectedYear
-                    month = selectedMonth+1
-                    day = selectedDay
+                //we need to set these so that the picker highlights the right day when opened again
+                selectedDate = LocalDate.parse(selectedDateString)
 
-                    //let's set the selected day
-                    actualDay = selectedDayString
+                //now we need to get the choice from the database and how the buttons should be highlighted
+                updateDayChoice()
 
-                    //now we need to get the choice from the database and how the buttons should be highlighted
-                    updateDayChoice()
-
-            }, year, month-1, day)
+            }, selectedDate.year, selectedDate.monthValue-1, selectedDate.dayOfMonth)
 
             dpd.show()
 
         }
 
+        //when we hit the meat-button
+        buttonMeat?.setOnClickListener {
+
+            if(databaseHandler.selectChoice(selectedDate.toString()) != 0) {
+                //only if it's not meat again
+
+                if(saveChoice(DMCChoice(selectedDate.toString(), 0))) {
+                    setButtonDesigns()
+                }
+
+
+            }
+
+        }
+
+        //when we hit the veggi-button
+        buttonVeggi?.setOnClickListener {
+
+            if(databaseHandler.selectChoice(selectedDate.toString()) != 1) {
+                //only if it's not veggi actually
+
+                if(saveChoice(DMCChoice(selectedDate.toString(), 1))) {
+                    setButtonDesigns()
+                }
+            }
+        }
+
+        //when we hit the vegan-button
+        buttonVegan?.setOnClickListener {
+
+            if(databaseHandler.selectChoice(selectedDate.toString()) != 2) {
+                //only if it's not vegan actually
+
+                if(saveChoice(DMCChoice(selectedDate.toString(), 2))) {
+                    setButtonDesigns()
+                }
+            }
+        }
+
+        //when we hit the notification button
+        buttonNotification?.setOnClickListener {
+            sendNotification()
+        }
+
+        //when we hit the stats button
         buttonGoToStats?.setOnClickListener {
 
             //setup the intent
@@ -209,7 +194,7 @@ class ActivityMain: AppCompatActivity() {
             intent.putExtra("today", LocalDate.now().toString())
 
             //what days is actually selected?
-            intent.putExtra("actualDay", actualDay)
+            intent.putExtra("selectedDate", selectedDate.toString())
 
             //get the oldest entry
             val dmcOldestEntry: DMCChoice? = databaseHandler.getOldestEntry()
@@ -279,13 +264,9 @@ class ActivityMain: AppCompatActivity() {
 
         }
 
-
-
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-
-
 
         var action = event.action
 
@@ -337,20 +318,15 @@ class ActivityMain: AppCompatActivity() {
                 x2 = 0.toFloat()
 
             }
-            else -> {
-
-                //we ignore any other cases
-
-            }
         }
 
-        //what should we do about the results?
+        //what should we do with these results?
 
         //maybe we should beat some threshold
-        //difference > 1/2 display width or sth like that
+        //difference > 1/10 display width or sth like that
         if(difference > displaySizeX/10) {
 
-            var newDate = LocalDate.parse(actualDay)
+            var newDate = selectedDate
 
             if(direction == "right") {
                 //go back in time
@@ -362,50 +338,37 @@ class ActivityMain: AppCompatActivity() {
 
             }
 
-
-            println("$actualDay ($year-$month-$day)")
-
-            year = newDate.year
-            month = newDate.month.value
-            day = newDate.dayOfMonth
-            actualDay = newDate.toString()
-
-
-            println("$actualDay ($year-$month-$day)")
+            selectedDate = newDate
 
             updateDayChoice()
 
         }
 
 
-        zeile0?.text = actionMode
-        zeile1?.text = x1.toString()
-        zeile2?.text = x2.toString()
-        zeile3?.text = direction
-        zeile4?.text = difference.toString()
+        debugTableRow0?.text = actionMode
+        debugTableRow1?.text = x1.toString()
+        debugTableRow2?.text = x2.toString()
+        debugTableRow3?.text = direction
+        debugTableRow4?.text = difference.toString()
 
 
-        // tell the View that we handled the event
+        // tell the view that we handled the event
         return true
-
 
     }
 
     private fun updateDayChoice() {
 
-        labelDate?.text = actualDay;
+        //set the selectedDateLabel's Text to what date is actual selected
+        selectedDateLabel?.text = selectedDate.toString()
 
-        //what is the actual choice if any?
-        actualChoice = databaseHandler.selectChoice(actualDay)
-
-        println("ActualChoice is $actualChoice")
-
+        //the actual choice may have changed -> set the button design
         setButtonDesigns()
 
     }
 
     private fun setButtonDesigns() {
-        when(actualChoice) {
+        when(databaseHandler.selectChoice(selectedDate.toString())) {
             null -> {
                 //nothing yet
                 buttonMeat?.setTextColor(getColor(R.color.colorDark))
@@ -433,56 +396,49 @@ class ActivityMain: AppCompatActivity() {
         }
     }
 
-
     /**
      * method for saving records in database
+     * @return true when choice is inserted or updated; false when sth else happened
      */
-    private fun saveChoice(day: String, choice: Int) {
+    private fun saveChoice(dmcChoice: DMCChoice): Boolean {
 
         //Do we have to insert or update?
 
 
-        var actualChoice = databaseHandler.selectChoice(day)
+        val actualChoice = databaseHandler.selectChoice(dmcChoice.day)
 
         if(actualChoice == null) {
             //nothing set -> insert
 
-            if(day.trim() != "") {
 
-                var dmc = DMCChoice(day, choice)
+            val status = databaseHandler.insertChoice(dmcChoice)
 
-                val status = databaseHandler.insertChoice(dmc)
+            if(status > -1){
+                Toast.makeText(applicationContext,"choice saved", Toast.LENGTH_LONG).show()
 
-                if(status > -1){
-                    Toast.makeText(applicationContext,"choice saved", Toast.LENGTH_LONG).show()
-                }
-
-            } else {
-                Toast.makeText(applicationContext,"day cannot be blank",Toast.LENGTH_LONG).show()
+                return true
             }
 
         } else {
-            //we do have something
+            //we already have something for the selected date
 
             //different?
-            if(actualChoice != choice) {
+            if(actualChoice != dmcChoice.choice) {
                 //update!
 
-                var dmc = DMCChoice(day, choice)
-
-                var resultUpdate = databaseHandler.updateChoice(dmc)
+                val resultUpdate = databaseHandler.updateChoice(dmcChoice)
 
                 if(resultUpdate == 1) {
                     Toast.makeText(applicationContext,"choice updated", Toast.LENGTH_LONG).show()
+                    return true
                 }
 
 
-            } else {
-                //still the same..relax
-
-
             }
+
         }
+
+        return false
 
 
     }

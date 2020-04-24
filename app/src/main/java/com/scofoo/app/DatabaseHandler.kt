@@ -306,9 +306,9 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
     }
 
-
-
-    //method to update data
+    /**
+     * method to update data
+     */
     fun updateChoice(dmc: DMCChoice):Int{
 
         val db = this.writableDatabase
