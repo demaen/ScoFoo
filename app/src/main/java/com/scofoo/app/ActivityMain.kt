@@ -5,11 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Point
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Display
 import android.view.MotionEvent
+import android.view.View
 import android.widget.Button
+import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
 import java.time.LocalDate
@@ -19,6 +22,8 @@ import java.util.Calendar.*
 
 
 class ActivityMain: AppCompatActivity() {
+
+    private val debugMode = false
 
     private val databaseHandler = DatabaseHandler(this)
 
@@ -36,6 +41,7 @@ class ActivityMain: AppCompatActivity() {
     var x1: Float? = 0.toFloat()
     var x2: Float? = 0.toFloat()
 
+    private var debugTable: TableLayout? = null
     private var zeile0: TextView? = null
     private var zeile1: TextView? = null
     private var zeile2: TextView? = null
@@ -68,11 +74,16 @@ class ActivityMain: AppCompatActivity() {
         buttonGoToStats = findViewById(R.id.buttonGoToStats)
 
         //get the table elements
+        debugTable = findViewById(R.id.debugTable)
         zeile0 = findViewById(R.id.zeile0)
         zeile1 = findViewById(R.id.zeile1)
         zeile2 = findViewById(R.id.zeile2)
         zeile3 = findViewById(R.id.zeile3)
         zeile4 = findViewById(R.id.zeile4)
+
+        if(debugMode) {
+            debugTable?.visibility = View.VISIBLE
+        }
 
         //get the datepickerlabelbutton
         labelDate = findViewById(R.id.date)

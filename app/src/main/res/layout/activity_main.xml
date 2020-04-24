@@ -75,9 +75,11 @@
         android:text="Stats" />
 
     <TableLayout
+        android:id="@+id/debugTable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="550dp">
+        android:layout_marginTop="550dp"
+        android:visibility="invisible">
 
         <TableRow
             android:layout_width="match_parent"
@@ -88,6 +90,7 @@
                 android:layout_height="wrap_content"
                 android:text="Mode: "
                 android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/zeile0"
                 android:layout_width="match_parent"
@@ -106,6 +109,7 @@
                 android:layout_height="wrap_content"
                 android:text="x1: "
                 android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/zeile1"
                 android:layout_width="match_parent"
@@ -124,6 +128,7 @@
                 android:layout_height="wrap_content"
                 android:text="x2: "
                 android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/zeile2"
                 android:layout_width="match_parent"
@@ -142,6 +147,7 @@
                 android:layout_height="wrap_content"
                 android:text="Direction: "
                 android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/zeile3"
                 android:layout_width="match_parent"
@@ -160,6 +166,7 @@
                 android:layout_height="wrap_content"
                 android:text="Difference: "
                 android:textSize="10sp" />
+
             <TextView
                 android:id="@+id/zeile4"
                 android:layout_width="match_parent"
