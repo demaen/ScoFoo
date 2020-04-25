@@ -57,13 +57,16 @@ class ActivityMain: AppCompatActivity() {
 
     private var notificationManager: NotificationManager? = null
 
+    init {
+
+        Log.v(LOGTAG, "Starting the Application")
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        Log.v(LOGTAG, "Starting the Application")
 
         //get the buttons
         buttonMeat = findViewById(R.id.buttonMeat)

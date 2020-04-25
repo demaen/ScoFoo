@@ -3,6 +3,7 @@ package com.scofoo.app
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -41,6 +42,7 @@ class ActivityStats: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stats)
 
+        //find all the views
         today = findViewById(R.id.today)
         selectedDateView = findViewById(R.id.selectedDate)
         oldestEntry = findViewById(R.id.oldestEntry)
@@ -50,7 +52,7 @@ class ActivityStats: AppCompatActivity() {
         daysMeat = findViewById(R.id.daysMeat)
         daysVeggi = findViewById(R.id.daysVeggi)
         daysVegan = findViewById(R.id.daysVegan)
-
+        buttonAddGoal = findViewById(R.id.buttonAddGoal)
 
         //what is today's date?
         today?.text = LocalDate.now().toString()
@@ -62,26 +64,14 @@ class ActivityStats: AppCompatActivity() {
         val dmcOldestEntry: DMCChoice? = databaseHandler.getOldestEntry()
 
         if(dmcOldestEntry != null) {
-            //@todo logd
-            println("Oldest Entry: " + dmcOldestEntry.day + " " + dmcOldestEntry.choice)
-
             oldestEntry?.text = dmcOldestEntry.day
-        } else {
-            //@todo logd
-            println("Oldest Entry: No choices found.")
         }
 
         //get the newest entry
         val dmcNewestEntry: DMCChoice? = databaseHandler.getNewestEntry()
 
         if(dmcNewestEntry != null) {
-            //@todo logd
-            println("Newest Entry: " + dmcNewestEntry.day + " " + dmcNewestEntry.choice)
-
             newestEntry?.text = dmcNewestEntry.day
-        } else {
-            //@todo logd
-            println("Newest Entry: No choices found.")
         }
 
         //how many days between oldest and newest?
@@ -96,15 +86,13 @@ class ActivityStats: AppCompatActivity() {
         //get the missing days
         if(dmcOldestEntry != null && dmcNewestEntry != null) {
 
-            val missingDaysCount = databaseHandler.getMissingDays(LocalDate.parse(dmcOldestEntry.day), LocalDate.parse(dmcNewestEntry.day))
+            //we will get a list of dates (the missing ones)
+            val missingDaysCount = databaseHandler.getMissingDaysCount(LocalDate.parse(dmcOldestEntry.day), LocalDate.parse(dmcNewestEntry.day))
 
-            if (missingDaysCount != null) {
-                missingDays?.text = missingDaysCount.count().toString()
-            } else {
-                missingDays?.text = "0"
-            }
+            missingDays?.text = missingDaysCount.toString()
 
         } else {
+            //if db is empty
             missingDays?.text = ""
         }
 
@@ -125,8 +113,6 @@ class ActivityStats: AppCompatActivity() {
         //now set the vegan days
         daysVegan?.text = daysVeganCount.toString()
 
-
-        buttonAddGoal = findViewById(R.id.buttonAddGoal)
 
         //get all the goals
         createTable()
@@ -199,12 +185,10 @@ class ActivityStats: AppCompatActivity() {
 
     private fun getGoalAchievable(dmcGoal: DMCGoal): Boolean? {
 
-        val goalDaysMissingList = databaseHandler.getMissingDays(dmcGoal.start, dmcGoal.end)
-        val goalDaysMissing = goalDaysMissingList?.count() ?: 0
+        val goalDaysMissing = databaseHandler.getMissingDaysCount(dmcGoal.start, dmcGoal.end)
 
         if(!getGoalAchieved(dmcGoal)) {
             //let's see if it's still achievable
-
 
             val goalDaysPotential = getGoalValue(dmcGoal) + goalDaysMissing
 
@@ -236,44 +220,57 @@ class ActivityStats: AppCompatActivity() {
     private fun createTable() {
 
         if(viewId != 0) {
+            //initially viewId is set to 0
+            //the following part is important when there already is a table
 
+            //so let's find this old table
             val oldTable = findViewById<TableLayout>(viewId)
 
             if (oldTable != null) {
                 //we should delete it first
                 (oldTable.parent as ViewGroup).removeView(oldTable)
-
             }
 
         }
 
+        //what goals do we have?
         dmcGoals = databaseHandler.selectGoals()
 
+        //define a new table
         val tableLayout by lazy { TableLayout(this) }
 
+        //we should apply some simple layout rules
         val lp = TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         tableLayout.apply {
             layoutParams = lp
             isShrinkAllColumns = false
         }
 
-        //generate new viewId
+        //generate a new random viewId
         viewId = View.generateViewId()
 
         //set it
         tableLayout.id = viewId
 
+        //we need some goals to proceed
         if(dmcGoals != null) {
 
             for (dmcGoal in dmcGoals!!) {
+                //foreach goal we do this:
 
+
+                Log.v(LOGTAG, "Starting to process a goal:")
+
+                //generate a new row
                 val row = TableRow(this)
 
+                //add some simple layout rules
                 row.layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
 
+                //first column: Start
                 val tv1 = TextView(this)
                 tv1.apply {
                     layoutParams = TableRow.LayoutParams(
@@ -282,7 +279,9 @@ class ActivityStats: AppCompatActivity() {
                     )
                     text = dmcGoal.start.toString()
                 }
+                row.addView(tv1)
 
+                //second column: End
                 val tv2 = TextView(this)
                 tv2.apply {
                     layoutParams = TableRow.LayoutParams(
@@ -291,7 +290,9 @@ class ActivityStats: AppCompatActivity() {
                     )
                     text = dmcGoal.end.toString()
                 }
+                row.addView(tv2)
 
+                //third column: Choice
                 val tv3 = TextView(this)
                 tv3.apply {
                     layoutParams = TableRow.LayoutParams(
@@ -300,7 +301,9 @@ class ActivityStats: AppCompatActivity() {
                     )
                     text = when(dmcGoal.choice) { 0 -> {"Meat"} 1 -> {"Veggi"} 2 -> {"Vegan"} else -> {""} }
                 }
+                row.addView(tv3)
 
+                //4th col: Type
                 val tv4 = TextView(this)
                 tv4.apply {
                     layoutParams = TableRow.LayoutParams(
@@ -309,7 +312,9 @@ class ActivityStats: AppCompatActivity() {
                     )
                     text = when(dmcGoal.type) { 0 -> {">="} 1 -> {"<="} 2 -> {"=="} else -> {""} }
                 }
+                row.addView(tv4)
 
+                //5th col: Target
                 val tv5 = TextView(this)
                 tv5.apply {
                     layoutParams = TableRow.LayoutParams(
@@ -318,7 +323,9 @@ class ActivityStats: AppCompatActivity() {
                     )
                     text = dmcGoal.target.toString()
                 }
+                row.addView(tv5)
 
+                //6th col: Value (what we have achieved so far)
                 val tv6 = TextView(this)
                 tv6.apply {
                     layoutParams = TableRow.LayoutParams(
@@ -327,42 +334,36 @@ class ActivityStats: AppCompatActivity() {
                     )
                     text = getGoalValue(dmcGoal).toString()
                 }
+                row.addView(tv6)
 
+                //7th col: have we already achieved our goal?
                 val tv7 = TextView(this)
+                val goalAchieved = getGoalAchieved(dmcGoal)
                 tv7.apply {
                     layoutParams = TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT
                     )
-                    text = getGoalAchieved(dmcGoal).toString()
+                    text = goalAchieved.toString()
                 }
+                row.addView(tv7)
 
+                //8th col: is it still achievable?
                 val tv8 = TextView(this)
                 tv8.apply {
                     layoutParams = TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT
                     )
-                    text = when(getGoalAchievable(dmcGoal)) {
-                        null -> {
-                            "-"
-                        }
-                        else -> {
-                            getGoalAchievable(dmcGoal).toString()
-                        }
-                    }
+                    text = getGoalAchievable(dmcGoal).toString()
                 }
-
-                row.addView(tv1)
-                row.addView(tv2)
-                row.addView(tv3)
-                row.addView(tv4)
-                row.addView(tv5)
-                row.addView(tv6)
-                row.addView(tv7)
                 row.addView(tv8)
 
                 tableLayout.addView(row)
+
+
+                Log.v(LOGTAG, "Finished processing a goal.")
+
             }
 
             linearLayout.addView(tableLayout)

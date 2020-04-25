@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(context,DATABASE_NAME,null,DATABASE_VERSION) {
 
@@ -31,6 +32,9 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
     init {
 
         LOGTAG = "$parentLogtag - ${this.LOGTAG}"
+
+        Log.v(LOGTAG, "init()")
+
 
     }
 
@@ -186,7 +190,7 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
      */
     fun selectChoice(day: String):Int? {
 
-        Log.v(LOGTAG, "selectChoice()")
+        Log.v(LOGTAG, "selectChoice($day)")
 
         val selectQuery = "SELECT $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_DAY='$day'"
         val db = this.readableDatabase
@@ -259,7 +263,7 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
         Log.v(LOGTAG, "getNewestEntry()")
 
-        val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES  ORDER BY $KEY_DAY DESC"
+        val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES ORDER BY $KEY_DAY DESC"
         val db = this.readableDatabase
 
         var cursor: Cursor? = null
@@ -292,11 +296,15 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
         return null
     }
 
+    /**
+     * You will get a List of all Dates, that haven't been set by any choice
+     * This is very expensive in time consumption!
+     */
     fun getMissingDays(start:LocalDate, end:LocalDate): MutableList<LocalDate>? {
 
-        Log.v(LOGTAG, "getMissingDays()")
+        Log.v(LOGTAG, "getMissingDays($start, $end) STARTING --->")
 
-        var resultList = mutableListOf<LocalDate>()
+        val resultList = mutableListOf<LocalDate>()
 
         if(start <= end) {
             //now we want to find all dates since our oldest entry, which have not been set by any choice
@@ -307,7 +315,9 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
 
             while (pointer <= end) {
+                //unless we have reached the end
 
+                //@todo requesting each day on it's own is slow
                 if(selectChoice(pointer.toString()) == null) {
                     //this day has no db entry
                     resultList.add(pointer)
@@ -318,21 +328,79 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
             }
 
         } else {
+
+            Log.e(LOGTAG, "getMissingDays($start, $end) Start must be <= End")
+
             return null
         }
 
         return if(resultList.count() == 0) {
+            Log.v(LOGTAG, "getMissingDays($start, $end) = 0 <---- RESULT")
+
             null
         } else {
+            Log.v(LOGTAG, "getMissingDays($start, $end) = ${resultList.count()} <---- RESULT")
+
             resultList
         }
 
 
     }
 
+    /**
+     * Here you get a count of all unset Dates
+     * That is much faster than getMissingDays()!
+     */
+    fun getMissingDaysCount(date1:LocalDate, date2:LocalDate): Int {
+
+        var missingDaysCount = 0;
+
+        //we assume that date1 <= date2
+        var start: LocalDate = date1
+        var end: LocalDate = date2
+
+        //let's get this in order
+        if(date1 > date2) {
+            //guessed wrong -> swap
+            start = date2
+            end = date1
+        }
+
+        val selectQuery = "SELECT COUNT($KEY_DAY) FROM $TABLE_CHOICES WHERE $KEY_DAY >= '$start' AND $KEY_DAY <= '$end'"
+        val db = this.readableDatabase
+        var cursor: Cursor? = null
+
+        try {
+            cursor = db.rawQuery(selectQuery, null)
+        } catch (e: SQLiteException) {
+            Log.e(LOGTAG, e.toString())
+        }
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+
+                val daysInRangeWithChoices = cursor.getInt(0)
+
+                val daysBetweenCount: Long = ChronoUnit.DAYS.between(start, end.plusDays(1))
+
+                missingDaysCount = daysBetweenCount.toInt() - daysInRangeWithChoices
+
+            }
+
+            cursor.close()
+        }
+
+        db.close()
+
+        Log.v(LOGTAG, "getMissingDaysNew($start, $end) = $missingDaysCount")
+
+        return missingDaysCount
+
+    }
+
     fun getDayCountOfChoice(choice: Int): Int {
 
-        Log.v(LOGTAG, "getDaysCountOfChoice(choice)")
+        Log.v(LOGTAG, "getDaysCountOfChoice($choice)")
 
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_CHOICE='$choice'"
         val db = this.readableDatabase
@@ -365,8 +433,6 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
     fun getDayCountOfChoice(choice: Int, start: String, end: String): Int {
 
-        Log.v(LOGTAG, "getDayCountOfChoice(choice, start, end)")
-
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_CHOICE='$choice' AND $KEY_DAY >= '$start' AND $KEY_DAY <= '$end'"
         val db = this.readableDatabase
 
@@ -375,7 +441,7 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            println("Could not exec getMeatDays() query!")
+            Log.e(LOGTAG, "Could not exec getMeatDays() query!")
         }
 
 
@@ -391,6 +457,8 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
         db.close()
 
+
+        Log.v(LOGTAG, "getDayCountOfChoice($choice, $start, $end) = $counter")
 
         return counter
 
