@@ -6,9 +6,12 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import java.time.LocalDate
 
-class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,null,DATABASE_VERSION) {
+class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(context,DATABASE_NAME,null,DATABASE_VERSION) {
+
+    private var LOGTAG = "DatabaseHandler"
 
     companion object {
         private val DATABASE_VERSION = 1
@@ -25,8 +28,16 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         private val KEY_GOAL_END = "goalEnd"
     }
 
+    init {
+
+        LOGTAG = "$parentLogtag - ${this.LOGTAG}"
+
+    }
+
     override fun onCreate(db: SQLiteDatabase?) {
         //creating table with fields
+
+        Log.v(LOGTAG, "onCreate()")
 
         db?.execSQL("CREATE TABLE " + TABLE_CHOICES + "("
                 + KEY_DAY + " TEXT PRIMARY KEY,"
@@ -42,6 +53,10 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+
+
+        Log.v(LOGTAG, "onUpgrade()")
+
         //db!!.execSQL("DROP TABLE IF EXISTS " + TABLE_CHOICES)
         //onCreate(db)
     }
@@ -50,6 +65,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
      *
      */
     fun insertChoice(dmc: DMCChoice):Long {
+
+        Log.v(LOGTAG, "insertChoice()")
 
         val db = this.writableDatabase
 
@@ -67,6 +84,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
     }
 
     fun insertGoal(dmcGoal: DMCGoal): Long {
+
+        Log.v(LOGTAG, "insertGoal()")
 
         val db = this.writableDatabase
 
@@ -89,6 +108,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
     }
 
     fun selectGoals(): MutableList<DMCGoal> {
+
+        Log.v(LOGTAG, "selectGoals()")
 
         var dmcGoals = mutableListOf<DMCGoal>()
 
@@ -135,6 +156,10 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
     }
 
     fun selectGoalsCount(): Int {
+
+
+        Log.v(LOGTAG, "selectGoalsCount()")
+
         val db = this.readableDatabase
         val selectQuery = "SELECT $KEY_GOAL_ID FROM $TABLE_GOALS"
 
@@ -160,6 +185,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
      * returns 0 1 2 when choice found
      */
     fun selectChoice(day: String):Int? {
+
+        Log.v(LOGTAG, "selectChoice()")
 
         val selectQuery = "SELECT $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_DAY='$day'"
         val db = this.readableDatabase
@@ -191,6 +218,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
     }
 
     fun getOldestEntry(): DMCChoice? {
+
+        Log.v(LOGTAG, "getOldestEntry()")
 
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES  ORDER BY $KEY_DAY ASC"
         val db = this.readableDatabase
@@ -228,6 +257,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
     fun getNewestEntry(): DMCChoice? {
 
+        Log.v(LOGTAG, "getNewestEntry()")
+
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES  ORDER BY $KEY_DAY DESC"
         val db = this.readableDatabase
 
@@ -262,6 +293,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
     }
 
     fun getMissingDays(start:LocalDate, end:LocalDate): MutableList<LocalDate>? {
+
+        Log.v(LOGTAG, "getMissingDays()")
 
         var resultList = mutableListOf<LocalDate>()
 
@@ -299,6 +332,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
     fun getDayCountOfChoice(choice: Int): Int {
 
+        Log.v(LOGTAG, "getDaysCountOfChoice(choice)")
+
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_CHOICE='$choice'"
         val db = this.readableDatabase
 
@@ -329,6 +364,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
     }
 
     fun getDayCountOfChoice(choice: Int, start: String, end: String): Int {
+
+        Log.v(LOGTAG, "getDayCountOfChoice(choice, start, end)")
 
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_CHOICE='$choice' AND $KEY_DAY >= '$start' AND $KEY_DAY <= '$end'"
         val db = this.readableDatabase
@@ -363,6 +400,8 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
      * method to update data
      */
     fun updateChoice(dmc: DMCChoice):Int{
+
+        Log.v(LOGTAG, "updateChoice()")
 
         val db = this.writableDatabase
 

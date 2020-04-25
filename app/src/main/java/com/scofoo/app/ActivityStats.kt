@@ -11,10 +11,14 @@ import android.widget.TableRow
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_stats.*
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class ActivityStats: AppCompatActivity() {
 
-    private val databaseHandler = DatabaseHandler(this)
+    private val LOGTAG = "9TGbQcB5 ActivityStats"
+
+    private val databaseHandler = DatabaseHandler(this, LOGTAG)
 
     private var dmcGoals: MutableList<DMCGoal>? = null
 
@@ -47,15 +51,80 @@ class ActivityStats: AppCompatActivity() {
         daysVeggi = findViewById(R.id.daysVeggi)
         daysVegan = findViewById(R.id.daysVegan)
 
-        today?.text = intent.getStringExtra("today")
+
+        //what is today's date?
+        today?.text = LocalDate.now().toString()
+
+        //get the selected date
         selectedDateView?.text = intent.getStringExtra("selectedDate")
-        oldestEntry?.text = intent.getStringExtra("oldestEntry")
-        newestEntry?.text = intent.getStringExtra("newestEntry")
-        daysBetween?.text = intent.getStringExtra("daysBetween")
-        missingDays?.text = intent.getStringExtra("missingDays")
-        daysMeat?.text = intent.getStringExtra("daysMeat")
-        daysVeggi?.text = intent.getStringExtra("daysVeggi")
-        daysVegan?.text = intent.getStringExtra("daysVegan")
+
+        //get the oldest entry
+        val dmcOldestEntry: DMCChoice? = databaseHandler.getOldestEntry()
+
+        if(dmcOldestEntry != null) {
+            //@todo logd
+            println("Oldest Entry: " + dmcOldestEntry.day + " " + dmcOldestEntry.choice)
+
+            oldestEntry?.text = dmcOldestEntry.day
+        } else {
+            //@todo logd
+            println("Oldest Entry: No choices found.")
+        }
+
+        //get the newest entry
+        val dmcNewestEntry: DMCChoice? = databaseHandler.getNewestEntry()
+
+        if(dmcNewestEntry != null) {
+            //@todo logd
+            println("Newest Entry: " + dmcNewestEntry.day + " " + dmcNewestEntry.choice)
+
+            newestEntry?.text = dmcNewestEntry.day
+        } else {
+            //@todo logd
+            println("Newest Entry: No choices found.")
+        }
+
+        //how many days between oldest and newest?
+        if(dmcOldestEntry != null && dmcNewestEntry != null) {
+            val dateBefore: LocalDate = LocalDate.parse(dmcOldestEntry.day)
+            val dateAfter: LocalDate = LocalDate.parse(dmcNewestEntry.day)
+            val daysBetweenCount: Long = ChronoUnit.DAYS.between(dateBefore, dateAfter.plusDays(1))
+
+            daysBetween?.text = daysBetweenCount.toString()
+        }
+
+        //get the missing days
+        if(dmcOldestEntry != null && dmcNewestEntry != null) {
+
+            val missingDaysCount = databaseHandler.getMissingDays(LocalDate.parse(dmcOldestEntry.day), LocalDate.parse(dmcNewestEntry.day))
+
+            if (missingDaysCount != null) {
+                missingDays?.text = missingDaysCount.count().toString()
+            } else {
+                missingDays?.text = "0"
+            }
+
+        } else {
+            missingDays?.text = ""
+        }
+
+        //count days meat
+        val daysMeatCount = databaseHandler.getDayCountOfChoice(0)
+        daysMeat?.text = daysMeatCount.toString()
+
+        //count days veggi
+        val daysVeggiCount = databaseHandler.getDayCountOfChoice(1)
+
+        //count days vegan
+        val daysVeganCount = databaseHandler.getDayCountOfChoice(2)
+
+        //of course vegan days are veggi too
+        val daysVeggiInclVegan = daysVeggiCount + daysVeganCount
+        daysVeggi?.text = "$daysVeggiCount (+ $daysVeganCount = $daysVeggiInclVegan)"
+
+        //now set the vegan days
+        daysVegan?.text = daysVeganCount.toString()
+
 
         buttonAddGoal = findViewById(R.id.buttonAddGoal)
 

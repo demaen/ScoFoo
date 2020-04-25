@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Point
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Display
 import android.view.MotionEvent
 import android.view.View
@@ -14,6 +14,8 @@ import android.widget.Button
 import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_stats.*
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -22,11 +24,13 @@ import java.util.Calendar.*
 
 class ActivityMain: AppCompatActivity() {
 
+    private val LOGTAG = "9TGbQcB5 ActivityMain"
+
     //by activating the debug mode some additional information will be displayed (like touch coordinates)
     private val debugMode = false
 
     //we need to connect to the database
-    private val databaseHandler = DatabaseHandler(this)
+    private val databaseHandler = DatabaseHandler(this, LOGTAG)
 
     private var today: LocalDate = LocalDate.now()
 
@@ -53,10 +57,13 @@ class ActivityMain: AppCompatActivity() {
 
     private var notificationManager: NotificationManager? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        Log.v(LOGTAG, "Starting the Application")
 
         //get the buttons
         buttonMeat = findViewById(R.id.buttonMeat)
@@ -79,6 +86,8 @@ class ActivityMain: AppCompatActivity() {
             buttonNotification?.visibility = View.VISIBLE
         }
 
+        Log.v(LOGTAG, "Debugmode: $debugMode")
+
         //get the Label for the selectedDate
         selectedDateLabel = findViewById(R.id.selectedDate)
 
@@ -87,6 +96,8 @@ class ActivityMain: AppCompatActivity() {
         val size: Point = Point()
         display.getSize(size)
         displaySizeX = size.x
+
+        Log.v(LOGTAG, "Handling a display width of $displaySizeX px")
 
         //let's take care of the notifications
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -187,91 +198,15 @@ class ActivityMain: AppCompatActivity() {
         //when we hit the stats button
         buttonGoToStats?.setOnClickListener {
 
-
             //setup the intent
             val intent = Intent(this, ActivityStats::class.java)
-
-            //what is today's date?
-            intent.putExtra("today", LocalDate.now().toString())
 
             //what days is actually selected?
             intent.putExtra("selectedDate", selectedDate.toString())
 
-            //get the oldest entry
-            val dmcOldestEntry: DMCChoice? = databaseHandler.getOldestEntry()
-
-            if(dmcOldestEntry != null) {
-                println("Oldest Entry: " + dmcOldestEntry.day + " " + dmcOldestEntry.choice)
-
-                intent.putExtra("oldestEntry", dmcOldestEntry.day)
-            } else {
-                println("Oldest Entry: No choices found.")
-            }
-
-            //get the newest entry
-            val dmcNewestEntry: DMCChoice? = databaseHandler.getNewestEntry()
-
-            if(dmcNewestEntry != null) {
-                println("Newest Entry: " + dmcNewestEntry.day + " " + dmcNewestEntry.choice)
-
-                intent.putExtra("newestEntry", dmcNewestEntry.day)
-            } else {
-                println("Newest Entry: No choices found.")
-            }
-
-            //how many days between oldest and newest?
-            if(dmcOldestEntry != null && dmcNewestEntry != null) {
-                val dateBefore: LocalDate = LocalDate.parse(dmcOldestEntry.day)
-                val dateAfter: LocalDate = LocalDate.parse(dmcNewestEntry.day)
-                val daysBetween: Long = ChronoUnit.DAYS.between(dateBefore, dateAfter.plusDays(1))
-
-                intent.putExtra("daysBetween", daysBetween.toString())
-            }
-
-            //get the missing days
-            if(dmcOldestEntry != null && dmcNewestEntry != null) {
-
-                val missingDays = databaseHandler.getMissingDays(LocalDate.parse(dmcOldestEntry.day), LocalDate.parse(dmcNewestEntry.day))
-
-                if (missingDays != null) {
-                    intent.putExtra("missingDays", missingDays.count().toString())
-                } else {
-                    intent.putExtra("missingDays", "0")
-                }
-
-            } else {
-                intent.putExtra("missingDays", "")
-            }
-
-            //count days meat
-            val daysMeat = databaseHandler.getDayCountOfChoice(0)
-            intent.putExtra("daysMeat", daysMeat.toString())
-
-            //count days veggi
-            val daysVeggi = databaseHandler.getDayCountOfChoice(1)
-
-            //count days vegan
-            val daysVegan = databaseHandler.getDayCountOfChoice(2)
-
-            //of course vegan days are veggi too
-            val daysVeggiInclVegan = daysVeggi + daysVegan
-            intent.putExtra("daysVeggi", "$daysVeggi (+ $daysVegan = $daysVeggiInclVegan)")
-
-            //now set the vegan days
-            intent.putExtra("daysVegan", daysVegan.toString())
-
             //come up with the activity
             this.startActivity(intent)
 
-
-
-
-            /*
-            val intent = Intent(this, ActivityGoals::class.java)
-            this.startActivity(intent)
-
-
-             */
         }
 
     }
