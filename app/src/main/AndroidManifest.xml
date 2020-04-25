@@ -18,7 +18,7 @@
         </activity>
         <activity android:name=".ActivityStats">
         </activity>
-        <activity android:name=".ActivityGoal">
+        <activity android:name=".ActivityGoalAdd">
         </activity>
     </application>
 

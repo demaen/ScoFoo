@@ -23,7 +23,7 @@ import java.util.Calendar.*
 class ActivityMain: AppCompatActivity() {
 
     //by activating the debug mode some additional information will be displayed (like touch coordinates)
-    private val debugMode = true
+    private val debugMode = false
 
     //we need to connect to the database
     private val databaseHandler = DatabaseHandler(this)
@@ -187,6 +187,7 @@ class ActivityMain: AppCompatActivity() {
         //when we hit the stats button
         buttonGoToStats?.setOnClickListener {
 
+
             //setup the intent
             val intent = Intent(this, ActivityStats::class.java)
 
@@ -262,6 +263,15 @@ class ActivityMain: AppCompatActivity() {
             //come up with the activity
             this.startActivity(intent)
 
+
+
+
+            /*
+            val intent = Intent(this, ActivityGoals::class.java)
+            this.startActivity(intent)
+
+
+             */
         }
 
     }

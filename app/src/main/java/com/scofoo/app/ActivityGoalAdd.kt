@@ -9,7 +9,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import java.time.LocalDate
 
-class ActivityGoal: AppCompatActivity() {
+class ActivityGoalAdd: AppCompatActivity() {
 
     private var dmcGoal: DMCGoal? = null
 
@@ -38,7 +38,7 @@ class ActivityGoal: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_goal)
+        setContentView(R.layout.activity_goal_add)
 
         radioGroupChoice = findViewById(R.id.radioGroupChoice)
         radioGroupType = findViewById(R.id.radioGroupType)
