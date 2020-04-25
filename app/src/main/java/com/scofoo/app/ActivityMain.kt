@@ -15,9 +15,7 @@ import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_stats.*
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.Calendar.*
 
@@ -96,7 +94,7 @@ class ActivityMain: AppCompatActivity() {
 
         //let's find out how big our screen is
         val display: Display = windowManager.defaultDisplay
-        val size: Point = Point()
+        val size = Point()
         display.getSize(size)
         displaySizeX = size.x
 
@@ -123,7 +121,7 @@ class ActivityMain: AppCompatActivity() {
                     selectedDay ->
 
                 //we have to build the String properly, because those values are int and need leading "0" maybe
-                var selectedDateString: String = "$selectedYear-"
+                var selectedDateString = "$selectedYear-"
 
                 //month starts with 0 = jan ... thats why incrementing it
                 //every month under 10 need a leading "0"
@@ -216,7 +214,7 @@ class ActivityMain: AppCompatActivity() {
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
 
-        var action = event.action
+        val action = event.action
 
         var actionMode = ""
         var direction = ""
@@ -410,7 +408,7 @@ class ActivityMain: AppCompatActivity() {
 
         val resultIntent = Intent(this, ActivityMain::class.java)
 
-        val datetimeToAlarm = Calendar.getInstance(Locale.getDefault())
+        val datetimeToAlarm = getInstance(Locale.getDefault())
         datetimeToAlarm.timeInMillis = System.currentTimeMillis()
         datetimeToAlarm.set(HOUR_OF_DAY, 22)
         datetimeToAlarm.set(MINUTE, 0)
