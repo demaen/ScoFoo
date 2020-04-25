@@ -58,6 +58,7 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
 
+        //@todo we definitely should start to handle this!
 
         Log.v(LOGTAG, "onUpgrade()")
 
@@ -115,17 +116,16 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
         Log.v(LOGTAG, "selectGoals()")
 
-        var dmcGoals = mutableListOf<DMCGoal>()
+        val dmcGoals = mutableListOf<DMCGoal>()
 
         val db = this.readableDatabase
         val selectQuery = "SELECT $KEY_GOAL_CHOICE, $KEY_GOAL_TYPE, $KEY_GOAL_TARGET, $KEY_GOAL_Start, $KEY_GOAL_END FROM $TABLE_GOALS"
-
         var cursor: Cursor? = null
 
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            println(e)
+            Log.e(LOGTAG, e.toString())
         }
 
         if (cursor != null) {
@@ -161,27 +161,29 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
     fun selectGoalsCount(): Int {
 
-
         Log.v(LOGTAG, "selectGoalsCount()")
+
+        var result = 0
 
         val db = this.readableDatabase
         val selectQuery = "SELECT $KEY_GOAL_ID FROM $TABLE_GOALS"
-
         var cursor: Cursor? = null
 
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            println(e)
+            Log.e(LOGTAG, e.toString())
         }
 
         if (cursor != null) {
 
-            return cursor.count
+            result = cursor.count
+
+            cursor.close()
 
         }
 
-        return 0
+        return result
     }
 
     /**
@@ -200,7 +202,7 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            println(e)
+            Log.e(LOGTAG, e.toString())
         }
 
         var result:Int? = null
@@ -218,44 +220,35 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
         return result
 
-
     }
 
     fun getOldestEntry(): DMCChoice? {
 
         Log.v(LOGTAG, "getOldestEntry()")
 
+        var dmcChoice: DMCChoice? = null
+
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES  ORDER BY $KEY_DAY ASC"
         val db = this.readableDatabase
-
         var cursor: Cursor? = null
 
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            println("error!")
+            Log.e(LOGTAG, e.toString())
         }
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-
-                db.close()
-
-                val dmcChoice = DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
-
-                cursor.close()
-
-
-                return dmcChoice
+                dmcChoice = DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
             }
-
 
             cursor.close()
         }
 
         db.close()
 
-        return null
+        return dmcChoice
 
     }
 
@@ -263,37 +256,29 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
         Log.v(LOGTAG, "getNewestEntry()")
 
+        var dmcChoice: DMCChoice? = null
+
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES ORDER BY $KEY_DAY DESC"
         val db = this.readableDatabase
-
         var cursor: Cursor? = null
 
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            println("error!")
+            Log.e(LOGTAG, e.toString())
         }
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-
-                db.close()
-
-                val dmcChoice = DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
-
-                cursor.close()
-
-                return dmcChoice
-
+                dmcChoice = DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
             }
 
             cursor.close()
         }
 
-
         db.close()
 
-        return null
+        return dmcChoice
     }
 
     /**
@@ -353,7 +338,7 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
      */
     fun getMissingDaysCount(date1:LocalDate, date2:LocalDate): Int {
 
-        var missingDaysCount = 0;
+        var missingDaysCount = 0
 
         //we assume that date1 <= date2
         var start: LocalDate = date1
@@ -410,7 +395,7 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: SQLiteException) {
-            println("Could not exec getMeatDays() query!")
+            Log.e(LOGTAG, e.toString())
         }
 
 
@@ -426,16 +411,16 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
 
         db.close()
 
-
         return counter
 
     }
 
     fun getDayCountOfChoice(choice: Int, start: String, end: String): Int {
 
+        var counter = 0
+
         val selectQuery = "SELECT $KEY_DAY, $KEY_CHOICE FROM $TABLE_CHOICES WHERE $KEY_CHOICE='$choice' AND $KEY_DAY >= '$start' AND $KEY_DAY <= '$end'"
         val db = this.readableDatabase
-
         var cursor: Cursor? = null
 
         try {
@@ -444,9 +429,6 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
             Log.e(LOGTAG, "Could not exec getMeatDays() query!")
         }
 
-
-        var counter = 0
-
         if(cursor != null) {
 
             counter = cursor.count
@@ -456,7 +438,6 @@ class DatabaseHandler(context: Context, parentLogtag: String): SQLiteOpenHelper(
         }
 
         db.close()
-
 
         Log.v(LOGTAG, "getDayCountOfChoice($choice, $start, $end) = $counter")
 
