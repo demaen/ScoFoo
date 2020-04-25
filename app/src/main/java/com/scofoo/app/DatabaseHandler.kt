@@ -183,6 +183,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
             cursor.close()
         }
 
+        db.close()
 
         return result
 
@@ -204,9 +205,22 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-                return DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
+
+                db.close()
+
+                val dmcChoice = DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
+
+                cursor.close()
+
+
+                return dmcChoice
             }
+
+
+            cursor.close()
         }
+
+        db.close()
 
         return null
 
@@ -228,10 +242,21 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
         if (cursor != null) {
             if (cursor.moveToFirst()) {
 
-                return DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
+                db.close()
+
+                val dmcChoice = DMCChoice(cursor.getString(cursor.getColumnIndex(KEY_DAY)), cursor.getInt(cursor.getColumnIndex(KEY_CHOICE)))
+
+                cursor.close()
+
+                return dmcChoice
 
             }
+
+            cursor.close()
         }
+
+
+        db.close()
 
         return null
     }
@@ -285,7 +310,21 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
             println("Could not exec getMeatDays() query!")
         }
 
-        return cursor?.count ?: 0
+
+        var counter = 0
+
+        if(cursor != null) {
+
+            counter = cursor.count
+
+            cursor.close()
+
+        }
+
+        db.close()
+
+
+        return counter
 
     }
 
@@ -302,7 +341,21 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context,DATABASE_NAME,
             println("Could not exec getMeatDays() query!")
         }
 
-        return cursor?.count ?: 0
+
+        var counter = 0
+
+        if(cursor != null) {
+
+            counter = cursor.count
+
+            cursor.close()
+
+        }
+
+        db.close()
+
+
+        return counter
 
     }
 
