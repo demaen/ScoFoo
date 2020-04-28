@@ -7,7 +7,8 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp">
+        android:layout_height="250dp"
+        android:paddingHorizontal="5dp">
 
         <TableRow
             android:layout_width="match_parent"
@@ -174,14 +175,16 @@
 
     <Button
         android:id="@+id/buttonAddGoal"
-        android:layout_height="50dp"
         android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
         android:text="Add Goal" />
 
     <TableLayout
         android:id="@+id/goalTableHeader"
         android:layout_width="match_parent"
-        android:layout_height="20dp">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
 
         <TableRow
             android:layout_width="match_parent"
@@ -189,17 +192,19 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="0.15"
                 android:layout_height="match_parent"
+                android:layout_weight="0.19"
+                android:gravity="center"
                 android:padding="2dp"
                 android:text="Start"
                 android:textSize="10sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="0.15"
                 android:layout_height="match_parent"
+                android:layout_weight="0.19"
+                android:gravity="center"
                 android:padding="2dp"
                 android:text="End"
                 android:textSize="10sp"
@@ -207,8 +212,9 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="0.10"
                 android:layout_height="match_parent"
+                android:layout_weight="0.09"
+                android:gravity="center"
                 android:padding="2dp"
                 android:text="Choice"
                 android:textSize="10sp"
@@ -216,26 +222,9 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="0.10"
                 android:layout_height="match_parent"
-                android:padding="2dp"
-                android:text="Type"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="0.10"
-                android:layout_height="match_parent"
-                android:padding="2dp"
-                android:text="Target"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="0.10"
-                android:layout_height="match_parent"
+                android:layout_weight="0.07"
+                android:gravity="center"
                 android:padding="2dp"
                 android:text="Value"
                 android:textSize="10sp"
@@ -243,8 +232,29 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="0.15"
                 android:layout_height="match_parent"
+                android:layout_weight="0.07"
+                android:gravity="center"
+                android:padding="2dp"
+                android:text="Type"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.08"
+                android:gravity="center"
+                android:padding="2dp"
+                android:text="Target"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.1"
+                android:gravity="center"
                 android:padding="2dp"
                 android:text="Achieved"
                 android:textSize="10sp"
@@ -252,10 +262,11 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="0.15"
                 android:layout_height="match_parent"
+                android:layout_weight="0.10"
+                android:gravity="center"
                 android:padding="2dp"
-                android:text="Achievable"
+                android:text="A.-able"
                 android:textSize="10sp"
                 android:textStyle="bold" />
         </TableRow>

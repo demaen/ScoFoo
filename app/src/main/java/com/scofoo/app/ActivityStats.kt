@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -187,9 +188,11 @@ class ActivityStats: AppCompatActivity() {
 
         val goalDaysMissing = databaseHandler.getMissingDaysCount(dmcGoal.start, dmcGoal.end)
 
+        //if it's not achieved yet..
         if(!getGoalAchieved(dmcGoal)) {
-            //let's see if it's still achievable
+            //..let's see if it's still achievable
 
+            //all remaining days plus achieved goals until now equals our potential
             val goalDaysPotential = getGoalValue(dmcGoal) + goalDaysMissing
 
             when (dmcGoal.type) {
@@ -266,18 +269,21 @@ class ActivityStats: AppCompatActivity() {
 
                 //add some simple layout rules
                 row.layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
+                row.gravity = Gravity.CENTER
 
                 //first column: Start
                 val tv1 = TextView(this)
                 tv1.apply {
                     layoutParams = TableRow.LayoutParams(
+                        0,
                         TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT
+                        0.19f
                     )
                     text = dmcGoal.start.toString()
+                    gravity = Gravity.CENTER
                 }
                 row.addView(tv1)
 
@@ -285,10 +291,12 @@ class ActivityStats: AppCompatActivity() {
                 val tv2 = TextView(this)
                 tv2.apply {
                     layoutParams = TableRow.LayoutParams(
+                        0,
                         TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT
+                        0.19f
                     )
                     text = dmcGoal.end.toString()
+                    gravity = Gravity.CENTER
                 }
                 row.addView(tv2)
 
@@ -296,43 +304,51 @@ class ActivityStats: AppCompatActivity() {
                 val tv3 = TextView(this)
                 tv3.apply {
                     layoutParams = TableRow.LayoutParams(
+                        0,
                         TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT
+                        0.09f
                     )
                     text = when(dmcGoal.choice) { 0 -> {"Meat"} 1 -> {"Veggi"} 2 -> {"Vegan"} else -> {""} }
+                    gravity = Gravity.CENTER
                 }
                 row.addView(tv3)
 
-                //4th col: Type
+                //4th col: Value (what we have achieved so far)
                 val tv4 = TextView(this)
                 tv4.apply {
                     layoutParams = TableRow.LayoutParams(
+                        0,
                         TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT
+                        0.07f
                     )
-                    text = when(dmcGoal.type) { 0 -> {">="} 1 -> {"<="} 2 -> {"=="} else -> {""} }
+                    text = getGoalValue(dmcGoal).toString()
+                    gravity = Gravity.CENTER
                 }
                 row.addView(tv4)
 
-                //5th col: Target
+                //5th col: Type
                 val tv5 = TextView(this)
                 tv5.apply {
                     layoutParams = TableRow.LayoutParams(
+                        0,
                         TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT
+                        0.08f
                     )
-                    text = dmcGoal.target.toString()
+                    text = when(dmcGoal.type) { 0 -> {">="} 1 -> {"<="} 2 -> {"=="} else -> {""} }
+                    gravity = Gravity.CENTER
                 }
                 row.addView(tv5)
 
-                //6th col: Value (what we have achieved so far)
+                //6th col: Target
                 val tv6 = TextView(this)
                 tv6.apply {
                     layoutParams = TableRow.LayoutParams(
+                        0,
                         TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT
+                        0.07f
                     )
-                    text = getGoalValue(dmcGoal).toString()
+                    text = dmcGoal.target.toString()
+                    gravity = Gravity.CENTER
                 }
                 row.addView(tv6)
 
@@ -341,21 +357,27 @@ class ActivityStats: AppCompatActivity() {
                 val goalAchieved = getGoalAchieved(dmcGoal)
                 tv7.apply {
                     layoutParams = TableRow.LayoutParams(
+                        0,
                         TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT
+                        0.1f
                     )
                     text = goalAchieved.toString()
+                    gravity = Gravity.CENTER
                 }
                 row.addView(tv7)
 
                 //8th col: is it still achievable?
+                val getGoalAchievable = getGoalAchievable(dmcGoal)
+
                 val tv8 = TextView(this)
                 tv8.apply {
                     layoutParams = TableRow.LayoutParams(
+                        0,
                         TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT
+                        0.10f
                     )
-                    text = getGoalAchievable(dmcGoal).toString()
+                    text = when(getGoalAchievable) {null -> {"-"} else -> {getGoalAchievable.toString()}}
+                    gravity = Gravity.CENTER
                 }
                 row.addView(tv8)
 
